@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ProcDNA Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  /* terri_sesne light theme */
+  --bg:#f5f7fa;--p1:#ffffff;--p2:#f1f4f8;--p3:#e6ebf1;
+  --b1:rgba(0,0,0,.06);--b2:rgba(0,0,0,.10);--b3:rgba(0,0,0,.15);
+  --tx:#0f1d2e;--t2:#4a5b6e;--t3:#7d8a98;
+  --gr:#1668b8;--bl:#1faaa3;--am:#d18a17;--rd:#d13b3b;--ok:#1aa15a;
+  --ok-bg:#e3f5ec;--ok-tx:#0e6e3c;
+  --wn-bg:#fdf3df;--wn-tx:#7a5000;
+  --er-bg:#fbe4e4;--er-tx:#99231f;
+  --ac:#1668b8;--ac2:#0f5294;--ac-light:#e6f1fb;
+  --mono:'JetBrains Mono',monospace;--body:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  --r:8px;--r2:12px;
+}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--body);font-size:14px;overflow:hidden}
+/* header */
+nav{height:48px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 18px;border-bottom:1px solid var(--b2);background:#ffffff;
+    box-shadow:0 1px 4px rgba(0,0,0,.08);position:fixed;top:0;left:0;right:0;z-index:50}
+.brand{display:flex;align-items:center;gap:9px}
+.brand-mark{width:28px;height:28px;background:linear-gradient(135deg,#1668b8,#1faaa3);
+  border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;font-family:var(--mono)}
+.brand-name{font-size:13px;font-weight:600;color:#0f1d2e}.brand-name em{color:#1668b8;font-style:normal}
+.brand-sub{font-size:9px;font-family:var(--mono);color:var(--t3);letter-spacing:.06em}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);
+  box-shadow:0 0 6px rgba(26,161,90,.5);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* layout */
+.layout{display:grid;grid-template-columns:1fr 1fr;height:100vh;padding-top:48px}
+/* left panel */
+.left{display:flex;flex-direction:column;border-right:1px solid var(--b1);overflow:hidden}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:10px 14px;flex-shrink:0;border-bottom:1px solid var(--b1)}
+.tab{padding:9px 6px;border-radius:var(--r);border:1px solid var(--b1);cursor:pointer;
+     transition:.15s;background:var(--p1);text-align:left}
+.tab:hover{border-color:rgba(22,104,184,.3);background:var(--ac-light)}
+.tab.on{border-color:var(--ac);background:var(--ac-light)}
+.tab-id{font-size:8px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:3px}
+.tab.on .tab-id{color:var(--ac)}
+.tab-name{font-size:11px;font-weight:600}
+.panel{flex:1;overflow-y:auto;padding:14px}
+.panel::-webkit-scrollbar{width:3px}
+.panel::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.pane{display:none}.pane.on{display:block}
+/* cards */
+.card{background:var(--p1);border:1px solid var(--b1);border-radius:var(--r2);padding:16px;margin-bottom:12px}
+.card-title{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ac);margin-bottom:12px}
+.note{font-size:12px;color:var(--t2);padding:10px 12px;background:var(--ac-light);border-radius:var(--r);border-left:3px solid var(--ac);line-height:1.6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
+.stat{background:var(--p2);border-radius:var(--r);padding:10px 12px}
+.stat-l{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:3px}
+.stat-v{font-size:20px;font-weight:700;line-height:1}
+.stat-s{font-size:10px;color:var(--t2);margin-top:2px}
+.c-gr{color:var(--gr)}.c-bl{color:var(--bl)}.c-am{color:var(--am)}.c-ok{color:var(--ok)}.c-rd{color:var(--rd)}
+.best-card{background:var(--ac-light);border:1px solid rgba(22,104,184,.25);border-radius:var(--r2);padding:14px;margin-bottom:12px}
+.best-tag{font-size:9px;font-family:var(--mono);text-transform:uppercase;color:var(--ac);letter-spacing:.1em;margin-bottom:5px}
+.best-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.best-sub{font-size:11px;color:var(--t2);margin-bottom:10px}
+.metrics{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.metric{background:var(--p1);border-radius:6px;padding:6px 3px;text-align:center}
+.metric-k{font-size:8px;font-family:var(--mono);color:var(--t3);margin-bottom:2px}
+.metric-v{font-size:11px;font-weight:600;color:var(--ac)}
+.table-wrap table{width:100%;border-collapse:collapse;font-size:11px}
+.table-wrap th{padding:5px 7px;border-bottom:1px solid var(--b1);font-size:9px;font-family:var(--mono);color:var(--t3);font-weight:400;text-align:left}
+.table-wrap td{padding:6px 7px;border-bottom:1px solid var(--b1);color:var(--t2)}
+.badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:20px}
+.b-ok{background:rgba(40,212,112,.12);color:var(--ok)}.b-am{background:rgba(240,192,64,.12);color:var(--am)}.b-rd{background:rgba(240,72,85,.12);color:var(--rd)}.b-gr{background:rgba(46,232,168,.12);color:var(--gr)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.btn{padding:7px 14px;border-radius:var(--r);border:1px solid var(--b2);background:var(--p2);
+     color:var(--t2);font-size:11px;cursor:pointer;font-family:var(--body);text-decoration:none;
+     transition:.15s;display:inline-block}
+.btn:hover{border-color:var(--gr);color:var(--gr)}
+.btn.pri{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.btn.pri:hover{background:var(--ac2)}
+/* progress */
+.prog-bar{height:5px;background:var(--b1);border-radius:20px;overflow:hidden;margin:8px 0}
+.prog-fill{height:100%;background:var(--ac);border-radius:20px;transition:width .5s}
+/* plan cards */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.plan-card{background:var(--p2);border-radius:var(--r2);padding:13px}
+.plan-card.adv{border:1px solid rgba(22,104,184,.3)}
+.plan-card.unc{border:1px solid rgba(74,143,245,.3)}
+.plan-tag{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.adv .plan-tag{color:var(--ac)}.unc .plan-tag{color:var(--bl)}
+.plan-name{font-size:12px;font-weight:600;margin-bottom:2px}
+.plan-sub{font-size:10px;color:var(--t2);margin-bottom:8px}
+.plan-btn{width:100%;padding:7px;border-radius:var(--r);border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--body)}
+.adv .plan-btn{background:var(--ac);color:#fff}.unc .plan-btn{background:var(--bl);color:#fff}
+/* comparison sliders */
+.sl-row{margin-bottom:11px}
+.sl-label{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:4px}
+.sl-label span:last-child{font-family:var(--mono);color:var(--tx)}
+input[type=range]{width:100%;accent-color:var(--ac);cursor:pointer}
+.cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.cmp-card{background:var(--p2);border-radius:var(--r);padding:12px}
+.cmp-card.best{border:1px solid rgba(46,232,168,.3)}.cmp-card.cust{border:1px solid rgba(74,143,245,.3)}
+.cmp-tag{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.best .cmp-tag{color:var(--gr)}.cust .cmp-tag{color:var(--bl)}
+.b-row{display:flex;align-items:center;gap:5px;padding:2px 0;font-size:10px;color:var(--t3)}
+.b-wrap{flex:1;height:3px;background:var(--b1);border-radius:2px;overflow:hidden}
+.b-fill{height:100%;border-radius:2px;transition:width .3s}
+/* right chat panel */
+.right{display:flex;flex-direction:column;background:#ffffff;overflow:hidden;border-left:1px solid var(--b2)}
+.chat-hdr{padding:10px 14px 8px;flex-shrink:0;border-bottom:1px solid var(--b1)}
+.chat-unit{font-size:11px;font-weight:600;margin-bottom:3px}
+.chat-sub{font-size:10px;color:var(--t3)}
+.qchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.qchip{padding:4px 10px;border-radius:20px;border:1px solid var(--b2);background:var(--p2);
+       color:var(--t2);font-size:10px;cursor:pointer;transition:.15s}
+.qchip:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-light)}
+/* messages */
+.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.msgs::-webkit-scrollbar{width:3px}
+.msgs::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.msg{display:flex;gap:8px;animation:fadein .2s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse;max-width:85%}
+.av{width:24px;height:24px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:2px}
+.av.bot{background:var(--ac-light);border:1px solid rgba(22,104,184,.2);color:var(--ac)}
+.av.usr{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.2);color:var(--am);font-weight:700}
+.bubble{padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.7;max-width:100%}
+.bubble.bot{background:#ffffff;border:1px solid var(--b2)}
+.bubble.usr{background:var(--ac-light);border:1px solid rgba(22,104,184,.2)}
+.bubble strong{color:var(--tx);font-weight:600}
+.bubble code{background:var(--p2);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px;color:var(--gr)}
+.bubble table{width:100%;border-collapse:collapse;margin:7px 0;font-size:11px}
+.bubble th{padding:5px 7px;border-bottom:1px solid var(--b2);font-size:9px;font-family:var(--mono);color:var(--t3);text-align:left;font-weight:400}
+.bubble td{padding:5px 7px;border-bottom:1px solid var(--b1);color:var(--t2)}
+.bubble ul{padding-left:14px;margin:4px 0}.bubble li{color:var(--t2);margin-bottom:2px}
+.bubble a.dl{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r);background:var(--gr);color:#000;font-weight:600;font-size:11px;text-decoration:none;margin-top:7px}
+/* chips inside chat */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{padding:6px 13px;border-radius:20px;border:1px solid var(--b2);background:var(--p2);
+      color:var(--t2);font-size:12px;cursor:pointer;transition:.15s;user-select:none}
+.chip:hover{border-color:var(--ac);color:var(--ac);background:var(--ac-light)}
+.chip.sel{border-color:var(--ac);background:var(--ac-light);color:var(--ac)}
+.chip:disabled,.chip[disabled]{opacity:.35;pointer-events:none}
+/* number input in chat */
+.num-row{display:flex;gap:7px;margin-top:8px}
+.num-in{flex:1;background:var(--p2);border:1px solid var(--b2);border-radius:var(--r);
+        padding:8px 11px;color:var(--tx);font-family:var(--body);font-size:13px;outline:none}
+.num-in:focus{border-color:var(--gr)}
+.num-ok{padding:8px 18px;border-radius:var(--r);background:var(--ac);border:none;
+        color:#fff;font-weight:600;font-size:12px;cursor:pointer;font-family:var(--body)}
+/* file drop in chat */
+.chat-dz{border:1.5px dashed var(--b2);border-radius:var(--r);padding:16px;text-align:center;
+         cursor:pointer;transition:.2s;position:relative;margin-top:8px}
+.chat-dz:hover,.chat-dz.ov{border-color:var(--ac);background:var(--ac-light)}
+.chat-dz.ok{border-color:var(--ok);background:rgba(40,212,112,.04)}
+.chat-dz input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.chat-dz p{font-size:12px;color:var(--t2)}
+/* typing */
+.dots{display:flex;gap:3px;align-items:center}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--ac);opacity:.3;animation:blink 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.slbl{font-size:11px;color:var(--bl);font-family:var(--mono);margin-left:8px;transition:opacity .3s}
+/* pills */
+.tpills{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px}
+.tpill{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:20px;background:rgba(74,143,245,.1);border:1px solid rgba(74,143,245,.2);color:var(--bl)}
+/* chat input */
+.chat-foot{padding:10px 14px;border-top:1px solid var(--b1);flex-shrink:0}
+.inp-row{display:flex;gap:7px;align-items:flex-end}
+textarea{flex:1;background:var(--bg);border:1px solid var(--b2);border-radius:var(--r);
+         padding:9px 12px;color:var(--tx);font-family:var(--body);font-size:13px;
+         outline:none;resize:none;min-height:40px;max-height:120px;line-height:1.5;transition:border-color .15s}
+textarea:focus{border-color:var(--ac)}
+textarea::placeholder{color:var(--t3)}
+.send{width:40px;height:40px;border-radius:var(--r);background:var(--ac);border:none;color:#fff;
+      font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s}
+.send:hover{background:var(--ac2)}.send:disabled{opacity:.4;cursor:not-allowed}
+.hint{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:4px}
+.sess{font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:20px;background:rgba(46,232,168,.07);border:1px solid rgba(46,232,168,.15);color:var(--t3)}
+.sess.live{color:var(--ac);border-color:rgba(22,104,184,.3)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="brand-mark">IC</div>
+    <div>
+      <div class="brand-name">Proc<em>DNA</em> Intelligence</div>
+      <div class="brand-sub">Enterprise IC Planning Platform</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="status-dot"></div>
+    <div class="sess" id="sess-pill">No session</div>
+  </div>
+</nav>
+
+<div class="layout">
+
+<!-- ══ LEFT: Results ══ -->
+<div class="left">
+  <div class="tabs">
+    <div class="tab on" id="tab1" onclick="showTab(1)"><div class="tab-id">Unit 01</div><div class="tab-name">IC Advisory</div></div>
+    <div class="tab" id="tab2" onclick="showTab(2)"><div class="tab-id">Unit 02</div><div class="tab-name">Goal Setting</div></div>
+    <div class="tab" id="tab3" onclick="showTab(3)"><div class="tab-id">Unit 03</div><div class="tab-name">Forecasting</div></div>
+    <div class="tab" id="tab4" onclick="showTab(4)"><div class="tab-id">Unit 04</div><div class="tab-name">Comparison</div></div>
+  </div>
+  <div class="panel">
+    <div class="pane on" id="p1"><div class="note">Complete IC Advisory in the chat →<br>Your recommended structure will appear here.</div></div>
+    <div class="pane" id="p2"><div class="note">Run Goal Setting in the chat →<br>Scenario results will appear here.</div></div>
+    <div class="pane" id="p3"><div class="note">Forecast results appear here after Goal Setting runs.</div></div>
+    <div class="pane" id="p4"><div class="note">Select a plan in Goal Setting to enable comparison sliders.</div></div>
+  </div>
+</div>
+
+<!-- ══ RIGHT: Chat ══ -->
+<div class="right">
+  <div class="chat-hdr">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="chat-unit" id="chat-unit-label">IC Advisory — IC Intelligence</div>
+        <div class="chat-sub">Each unit has its own conversation</div>
+      </div>
+    </div>
+  </div>
+  <div class="msgs" id="msgs"></div>
+  <div class="qchips" id="qchips" style="padding:6px 14px 0;flex-shrink:0"></div>
+  <div class="chat-foot">
+    <div class="inp-row">
+      <textarea id="inp" placeholder="Ask anything about IC planning…" rows="1"
+        onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+      <button class="send" id="send-btn" onclick="sendMsg()">&#10148;</button>
+    </div>
+    <div class="hint">Enter to send · Shift+Enter for new line</div>
+  </div>
+</div>
+
+<!-- ══ SLIDER PANEL (unit 4) ══ -->
+<div id="slider-panel" style="display:none;flex-direction:column;background:var(--p1);overflow:hidden;border-left:1px solid var(--b1)">
+  <div style="padding:12px 14px 10px;flex-shrink:0;border-bottom:1px solid var(--b1)">
+    <div style="font-size:13px;font-weight:600">Custom Scenario Builder</div>
+    <div style="font-size:10px;color:var(--t3);margin-top:2px">Adjust weights — left panel updates live</div>
+  </div>
+  <div id="slider-body" style="flex:1;overflow-y:auto;padding:14px">
+    <div class="note">Select a plan from Goal Setting to enable sliders.</div>
+  </div>
+</div>
+</div><!-- /layout -->
+
+<script>
+// ══════════════════════════════════════════════
+// HELPERS (defined first — used in STATE init)
+// ══════════════════════════════════════════════
+function rand() { return Math.random().toString(36).substr(2,8); }
+function $(id)  { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(n) { try { return Number(n).toLocaleString(); } catch(e) { return n; } }
+function pf(n)  { try { return parseFloat(n).toFixed(3); } catch(e) { return '—'; } }
+function statCard(l,v,s,c) { return '<div class="stat"><div class="stat-l">'+l+'</div><div class="stat-v '+c+'">'+v+'</div><div class="stat-s">'+s+'</div></div>'; }
+
+function dlExcel(sid) {
+  if (!sid) { msgBot('No session found. Please run Goal Setting first.', []); return; }
+  // Create a hidden anchor and click it to force download
+  var a = document.createElement('a');
+  a.href = '/api/export/session/' + sid + '/excel';
+  a.download = 'procdna_goals_' + sid.substr(0,8) + '.xlsx';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); }, 1000);
+}
+
+function dlCSV(sid) {
+  if (!sid) return;
+  var a = document.createElement('a');
+  a.href = '/api/export/session/' + sid + '/csv';
+  a.download = 'procdna_goals_' + sid.substr(0,8) + '.csv';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); }, 1000);
+}
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+var S = {
+  sid: null,
+  busy: false,
+  unit: 1,
+  csid: {
+    1: 'u1_' + rand(), 2: 'u2_' + rand(),
+    3: 'u3_' + rand(), 4: 'u4_' + rand()
+  },
+  // Goal setting state
+  gs: { step: 0, file: null, lb: '12', nf: null, sm: 'Run all methods', pm: 'Run all splits', preset: 'fairness' },
+  // IC Advisory state
+  ic: { step: 0, answers: {} },
+  // IC Advisory questions
+  icQ: [
+    { k:'st', q:'What lifecycle stage is the product in?',          opts:['Launch','Growth','Mature'] },
+    { k:'ob', q:'What is the primary business objective?',          opts:['Revenue Growth','Market Expansion','Retention / Stability','Profitability / Margin','Product Mix','Productivity'] },
+    { k:'ro', q:'What sales role is this plan for?',                opts:['Field Sales Rep','Inside Sales / SDR','Key Account Manager','Sales Manager','Specialist / Overlay','Channel / Partner Sales'] },
+    { k:'pl', q:'What plan type do you prefer?',                    opts:['Individual','Regional / Team','Hybrid','No Preference'] },
+    { k:'py', q:'What is your pay philosophy?',                     opts:['Aggressive (high variable)','Balanced','Conservative (stable base)'] },
+    { k:'gs', q:'What is your goal-setting preference?',            opts:['Historical (6/9/12 months)','Absolute Growth-based','Percent Growth-based','Forecast-driven','Scenario-based'] },
+    { k:'co', q:'How much collaboration does this role require?',   opts:['Low — individual hunter','Medium — some coordination','High — team-based'] },
+    { k:'si', q:'How complex should the plan be?',                  opts:['Simple — one metric','Moderate — two metrics','Complex — multiple metrics'] },
+    { k:'tv', q:'How variable are your territories?',               opts:['Homogeneous — similar size','Moderately Variable','Highly Variable'] },
+    { k:'sm', q:'How is sales primarily executed?',                 opts:['Individual-driven','Team-based','Hybrid model','Overlay-driven'] }
+  ]
+};
+
+function rand() { return Math.random().toString(36).substr(2,8); }
+function $(id)  { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(n) { try { return Number(n).toLocaleString(); } catch(e) { return n; } }
+function pf(n)  { try { return parseFloat(n).toFixed(3); } catch(e) { return '—'; } }
+
+// ══════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════
+var UNIT_LABELS = { 1:'IC Advisory', 2:'Goal Setting', 3:'Forecasting', 4:'Comparison' };
+var UNIT_CHIPS  = {
+  1: [['Start IC Advisory','startIC()'],['IC structure advice','chat("What IC structure should I use for a growth-stage field sales team?")'],['Pay mix explained','chat("What is pay mix and what ratio should I use?")'],['Attainability guide','chat("What is attainability score and what is good?")']],
+  2: [['Run Goal Setting','startGS()'],['Show top 5 scenarios','chatData("Show me the top 5 scenarios")'],['Territories below target','chatData("Which territories are below target?")'],['Run guardrails','chatData("Run guardrails check")']],
+  3: [['Upload for forecast','startForecast()'],['Model competition results','chatData("Which forecast model won the most territories?")'],['What is wMAPE?','chat("What is wMAPE and what is a good score?")'],['Explain Holt','chat("What is Holt forecasting?")']],
+  4: [['View comparison','showTab(4);buildSliders()'],['Delta insights','chatData("Compare best vs preferred scenario")'],['Executive summary','chatData("Give me an executive summary")'],['Export Excel','doExport()']]
+};
+
+function showTab(n) {
+  for (var i = 1; i <= 4; i++) {
+    var t = $('tab'+i), p = $('p'+i);
+    if (t) t.className = 'tab' + (i===n?' on':'');
+    if (p) p.className = 'pane' + (i===n?' on':'');
+  }
+  S.unit = n;
+  var lbl = $('chat-unit-label');
+  if (lbl) lbl.textContent = UNIT_LABELS[n] + ' — IC Intelligence';
+  renderChips(n);
+  if (n===4) {
+    var cr = document.querySelector('.right');
+    var sp = document.getElementById('slider-panel');
+    if(cr) cr.style.display='none';
+    if(sp) sp.style.display='flex';
+    loadComparisonData();
+  } else {
+    var cr2 = document.querySelector('.right');
+    var sp2 = document.getElementById('slider-panel');
+    if(cr2) cr2.style.display='flex';
+    if(sp2) sp2.style.display='none';
+  }
+}
+
+function renderChips(n) {
+  var el = $('qchips'); if (!el) return;
+  var chips = UNIT_CHIPS[n] || [];
+  // Chips always work - they reset S.busy first so they're never blocked
+  el.innerHTML = chips.map(function(c) {
+    return '<div class="qchip" onclick="S.busy=false;$(\'send-btn\').disabled=false;' + c[1] + '">' + c[0] + '</div>';
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// CHAT CORE
+// ══════════════════════════════════════════════
+function resize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+function onKey(e) { if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+function scrollDown() { var m=$('msgs'); if(m) m.scrollTop=m.scrollHeight; }
+
+function sendMsg() {
+  if (S.busy) return;
+  var inp = $('inp'); if (!inp) return;
+  var txt = inp.value.trim(); if (!txt) return;
+  inp.value = ''; inp.style.height = 'auto';
+  chat(txt);
+}
+
+function msgUser(txt) {
+  var m = $('msgs'); if (!m) return;
+  var d = document.createElement('div');
+  d.className = 'msg user';
+  d.innerHTML = '<div class="av usr">U</div><div class="bubble usr">' + esc(txt) + '</div>';
+  m.appendChild(d); scrollDown();
+}
+
+function msgBot(html, tools) {
+  var m = $('msgs'); if (!m) return null;
+  var d = document.createElement('div');
+  d.className = 'msg';
+  var pills = '';
+  if (tools && tools.length) {
+    pills = '<div class="tpills">' + tools.map(function(t) {
+      return '<span class="tpill">⚡ ' + t.replace(/_/g,' ') + '</span>';
+    }).join('') + '</div>';
+  }
+  d.innerHTML = '<div class="av bot">IC</div><div class="bubble bot">' + pills + html + '</div>';
+  m.appendChild(d); scrollDown();
+  return d;
+}
+
+function msgTyping() {
+  var m = $('msgs'); if (!m) return null;
+  var id = 'ty' + Date.now();
+  var d = document.createElement('div');
+  d.id = id; d.className = 'msg';
+  d.innerHTML = '<div class="av bot">IC</div><div class="bubble bot" style="color:var(--t3)">' +
+    '<div style="display:flex;align-items:center">' +
+    '<div class="dots"><span></span><span></span><span></span></div>' +
+    '<span class="slbl" id="' + id + 'l">Thinking…</span>' +
+    '</div></div>';
+  m.appendChild(d); scrollDown();
+  var labels = ['Thinking…','Analysing…','Generating…'];
+  var li = 0;
+  d._iv = setInterval(function() {
+    li = (li+1) % labels.length;
+    var el = $(id+'l');
+    if (el) { el.style.opacity='0'; setTimeout(function(){ if(el){ el.textContent=labels[li]; el.style.opacity='1'; } },250); }
+  }, 1400);
+  return id;
+}
+
+function rmTyping(id) {
+  var el = $(id); if (!el) return;
+  if (el._iv) clearInterval(el._iv);
+  el.remove();
+}
+
+// Append widget element below last bot message
+function appendWidget(html) {
+  var m = $('msgs'); if (!m) return;
+  var d = document.createElement('div');
+  d.className = 'msg';
+  d.innerHTML = '<div class="av bot" style="visibility:hidden"></div><div style="flex:1">' + html + '</div>';
+  m.appendChild(d); scrollDown();
+  return d;
+}
+
+// chips3(options, callback) — renders inline choice chips in the chat flow
+// options: array of [label, value] pairs — pass plain strings, NOT esc()'d
+// callback: function(label, value) called when user picks one
+function chips3(options, cb) {
+  var uid = 'chips_' + Math.random().toString(36).substr(2, 6);
+  var h = '<div class="chips" id="' + uid + '">';
+  options.forEach(function(opt, i) {
+    var lbl = opt[0], val = opt[1];
+    h += '<div class="chip" data-idx="' + i + '" onclick="chips3Click(\'' + uid + '\',' + i + ')">'
+       + esc(lbl) + '</div>';
+  });
+  h += '</div>';
+  // Store options on window keyed by uid
+  window['_chips3_opts_' + uid] = options;
+  window['_chips3_cb_'  + uid] = cb;
+  appendWidget(h);
+}
+
+function chips3Click(uid, idx) {
+  var opts = window['_chips3_opts_' + uid];
+  var cb   = window['_chips3_cb_'  + uid];
+  if (!opts || !cb) return;
+  var lbl = opts[idx][0], val = opts[idx][1];
+  // Lock all chips, highlight selected
+  var c = document.getElementById(uid);
+  if (c) c.querySelectorAll('.chip').forEach(function(x) {
+    x.style.pointerEvents = 'none';
+    x.style.opacity = (parseInt(x.getAttribute('data-idx')) === idx) ? '1' : '0.35';
+  });
+  // Cleanup
+  delete window['_chips3_opts_' + uid];
+  delete window['_chips3_cb_'  + uid];
+  cb(lbl, val);
+}
+
+// md renderer
+function md(t) {
+  // tables
+  t = t.replace(/\|(.+)\|\n\|[-| :]+\|\n((?:\|.+\|\n?)+)/g, function(_,h,rows){
+    var ths = h.split('|').filter(function(c){return c.trim();}).map(function(c){return '<th>'+esc(c.trim())+'</th>';}).join('');
+    var trs = rows.trim().split('\n').map(function(r){return '<tr>'+r.split('|').filter(function(c){return c.trim();}).map(function(c){return '<td>'+esc(c.trim())+'</td>';}).join('')+'</tr>';}).join('');
+    return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+  });
+  t = t.replace(/```[\s\S]*?```/g, function(m){ return '<pre style="background:var(--p2);padding:9px;border-radius:7px;font-family:var(--mono);font-size:11px;margin:6px 0;overflow-x:auto">'+esc(m.replace(/```\w*/g,'').trim())+'</pre>'; });
+  t = t.replace(/`([^`]+)`/g, function(_,c){ return '<code>'+esc(c)+'</code>'; });
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/^- (.+)$/gm, '<li>$1</li>');
+  t = t.replace(/(<li>[\s\S]+?<\/li>)/g, '<ul>$1</ul>');
+  t = t.replace(/<\/ul>\s*<ul>/g, '');
+  t = t.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  return t;
+}
+
+// Main chat function — routes intent, falls back to /api/chat
+function chat(text) {
+  if (S.busy) {
+    // Don't silently drop messages - if stuck for > 0.5s, auto-reset
+    S.busy = false;
+    $('send-btn').disabled = false;
+  }
+  msgUser(text);
+  var t = text.toLowerCase();
+
+  // IC Advisory intent
+  if (S.ic.step === 0 && (t.indexOf('ic advisory')>-1 || t.indexOf('start advisory')>-1 || t.indexOf('unit 1')>-1 || t.indexOf('unit 01')>-1 || t.indexOf('start ic')>-1)) {
+    startIC(); return;
+  }
+  // Goal Setting intent
+  if (S.gs.step === 0 && (t.indexOf('goal setting')>-1 || t.indexOf('run goal')>-1 || t.indexOf('unit 2')>-1 || t.indexOf('unit 02')>-1)) {
+    startGS(); return;
+  }
+  // Comparison intent
+  if (t.indexOf('comparison')>-1 || t.indexOf('unit 4')>-1 || t.indexOf('slider')>-1) {
+    showTab(4); buildSliders();
+    msgBot('Comparison sliders are on the <strong>left panel</strong>. Adjust the splits and weights to build your custom scenario.', []);
+    return;
+  }
+  // Export intent
+  if (t.indexOf('export')>-1 || t.indexOf('download')>-1 || t.indexOf('excel')>-1) {
+    if (!S.sid) { msgBot('Run Goal Setting first to generate a session.', []); return; }
+    msgBot('Download your results:<br><a class="dl" href="/api/export/session/'+S.sid+'/excel" target="_blank">⬇ Excel (4 sheets)</a>', []);
+    return;
+  }
+  // Guardrails
+  if (t.indexOf('guardrail')>-1) {
+    if (!S.sid) { msgBot('Run Goal Setting first.', []); return; }
+    doGuardrails(); return;
+  }
+  // Delta
+  if (t.indexOf('delta')>-1 || t.indexOf('compare best')>-1) {
+    if (!S.sid) { msgBot('Run Goal Setting first.', []); return; }
+    doDelta(); return;
+  }
+  // Local knowledge
+  var local = localKnowledge(t);
+  if (local) { msgBot(local, []); return; }
+  // API call
+  apiChat(text);
+}
+
+// Direct data queries — always go to API with session
+function chatData(text) {
+  if (!S.sid) { msgUser(text); msgBot('Run Goal Setting first to generate session data.', []); return; }
+  chat(text);
+}
+
+function apiChat(text) {
+  S.busy = true; $('send-btn').disabled = true;
+  var tid = msgTyping();
+  fetch('/api/chat', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ message:text, chat_session_id:S.csid[S.unit], goal_session_id:S.sid||'' })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    rmTyping(tid); S.busy=false; $('send-btn').disabled=false;
+    var reply = d.reply || '';
+    if (!reply || reply.indexOf('API_KEY')>-1) reply = localKnowledge('help') || 'I can help with IC Advisory, Goal Setting, Guardrails, Comparison and Export. Try saying <em>Start IC Advisory</em> or <em>Run Goal Setting</em>.';
+    msgBot(md(reply), d.tools_called||[]);
+    if (d.tool_results) d.tool_results.forEach(function(tr){
+      var r = tr.result||{};
+      if (r.url && r.url.indexOf('/excel')>-1) {
+        var last = $('msgs').querySelector('.msg:last-child .bubble.bot');
+        if (last) { var a=document.createElement('a'); a.href=r.url; a.className='dl'; a.target='_blank'; a.textContent='⬇ Download Excel'; last.appendChild(a); }
+      }
+    });
+  })
+  .catch(function(){
+    rmTyping(tid); S.busy=false; $('send-btn').disabled=false;
+    msgBot('I can help with IC Advisory, Goal Setting, Guardrails, Comparison and Export. Try saying <em>Start IC Advisory</em> or <em>Run Goal Setting</em>.', []);
+  });
+}
+
+// Local knowledge — no API needed
+function localKnowledge(t) {
+  if (t.indexOf('fairness') > -1 && t.indexOf('score') > -1) return '<strong>Fairness Score</strong> (0–1) combines 7 metrics: <strong>P</strong> Proportionality · <strong>A</strong> Attainability · <strong>C</strong> Consistency · <strong>Ga</strong> Growth Alignment · <strong>V</strong> Volatility Penalty · <strong>K</strong> Cost Efficiency · <strong>S</strong> Goal Spread. A score above 0.80 is strong.';
+  if (t.indexOf('wmape') > -1 || t.indexOf('mape') > -1) return '<strong>wMAPE</strong> (Weighted Mean Absolute % Error) measures forecast accuracy. Lower is better.<br>Under 0.10 = Excellent · 0.10–0.20 = Good · Over 0.20 = Moderate<br>Confidence = 1 − wMAPE.';
+  if (t.indexOf('hybrid') > -1) return '<strong>Hybrid plan modes</strong> split goals between regional and individual:<br>· 70/30 — heavier regional (new territories)<br>· 60/40 — most common<br>· 50/50 — equal weight<br>Choose Hybrid for both team fairness and individual accountability.';
+  if (t.indexOf('pareto') > -1 || t.indexOf('the one') > -1) return '<strong>Pareto selection</strong> picks "The One" via: 1) Pareto frontier (no dominated scenarios) 2) Rank by preset weights 3) Tie-break: highest confidence → lowest cost variance → simplest structure.';
+  if (t.indexOf('preset') > -1 || t.indexOf('growth mode') > -1 || t.indexOf('cost mode') > -1) return '<strong>Three presets:</strong><br>· <strong>Fairness</strong> — Proportionality, Consistency, Attainability (default)<br>· <strong>Growth</strong> — Attainability, Growth Alignment, Goal Spread<br>· <strong>Cost</strong> — Cost Efficiency, Volatility, Consistency';
+  if (t.indexOf('attain') > -1 && t.indexOf('what') > -1) return '<strong>Attainability (A)</strong> = % of territories where forecast is within ±15% of goal. A score of 0.90 means 90% of reps can hit their number. Aim for 0.80+.';
+  if (t.indexOf('pay mix') > -1 || t.indexOf('paymix') > -1) return '<strong>Pay Mix</strong> = base salary to variable ratio:<br>· Aggressive 50/50 — high upside, competitive<br>· Balanced 70/30 — most field roles<br>· Conservative 80/20 — account management';
+  if ((t.indexOf('model') > -1 && t.indexOf('forecast') > -1) || t.indexOf('holt') > -1) return '<strong>15 models compete</strong> per territory: Naive, Mean, Moving Average, Weighted MA, Linear Trend, Drift, Exp Trend, SES, Holt, Holt-Winters, Theta, Median, ARIMA, XGBoost, Poisson Trend. The model with the lowest wMAPE on a holdout period wins.';
+  if (t.indexOf('help') > -1 || t.indexOf('what can') > -1 || t.indexOf('what do you') > -1) return 'I can help with:<br>· <strong>IC Advisory</strong> — recommend an IC structure<br>· <strong>Goal Setting</strong> — upload data, run 12-model forecast, score scenarios<br>· <strong>Guardrails</strong> — validate the plan<br>· <strong>Comparison</strong> — compare scenarios with sliders<br>· <strong>Export</strong> — Excel / CSV<br><br>Say <em>Start IC Advisory</em> or <em>Run Goal Setting</em> to begin.';
+  return null;
+}
+
+// ══════════════════════════════════════════════
+// IC ADVISORY
+// ══════════════════════════════════════════════
+function startIC() {
+  S.ic.step = 0; S.ic.answers = {};
+  showTab(1);
+  msgBot("Let's run <strong>IC Advisory</strong>. I'll ask 8 quick questions — click an option or type your answer. Results will appear on the left.", []);
+  setTimeout(askIC, 400);
+}
+
+function askIC() {
+  if (S.ic.step >= S.ic.answers && S.ic.step >= S.icQ.length) { finishIC(); return; }
+  var q = S.icQ[S.ic.step];
+  var html = '<div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:6px">Q'+(S.ic.step+1)+' of '+S.icQ.length+'</div>' +
+    '<div style="margin-bottom:10px">'+esc(q.q)+'</div>' +
+    '<div class="chips">' + q.opts.map(function(o){
+      return '<div class="chip" onclick="ansIC(\''+q.k+'\',\''+esc(o)+'\',this.closest(\'.chips\'))">' + esc(o) + '</div>';
+    }).join('') + '</div>';
+  appendWidget(html);
+}
+
+function ansIC(key, val, chipsEl) {
+  if (chipsEl) chipsEl.querySelectorAll('.chip').forEach(function(c){
+    c.setAttribute('disabled','1');
+    c.style.opacity = (c.textContent===val?'1':'.3');
+    if (c.textContent===val) c.classList.add('sel');
+  });
+  S.ic.answers[key] = val;
+  S.ic.step++;
+  msgUser(val);
+  if (S.ic.step >= S.icQ.length) { setTimeout(finishIC, 400); return; }
+  setTimeout(askIC, 400);
+}
+
+function finishIC() {
+  var a = S.ic.answers;
+  msgBot('All answers captured. Generating your IC structure recommendation…', []);
+  var prompt = 'You are a senior IC consulting advisor. Client context:\n' +
+    'Lifecycle: '+a.st+'\nObjective: '+a.ob+'\nRole: '+a.ro+'\nPlan type: '+a.pl+
+    '\nPay philosophy: '+a.py+'\nGoal setting: '+a.gs+'\nCollaboration: '+a.co+'\nTerritory variability: '+a.tv+'\n\n'+
+    'Write a recommendation in 4 flowing paragraphs. No bullets, no IDs, no headers. Warm consultant tone.\n'+
+    'Para 1: What structure selected and why (2-3 sentences).\n'+
+    'Para 2: What this means for reps day-to-day (2 sentences).\n'+
+    'Para 3: How goals will be set (2 sentences).\n'+
+    'Para 4: Two governance watch-outs (2 sentences).';
+  fetch('/api/advisory/generate', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ prompt:prompt, plan_type:a.pl||'', goal_setting:a.gs||'' }) })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var txt = (d.text||'').replace(/\n\n/g,'<br><br>').replace(/\n/g,' ');
+    $('p1').innerHTML = '<div class="card"><div class="card-title">IC Advisory — Your Recommended Structure</div>' +
+      '<div style="font-size:13px;line-height:1.9;color:var(--tx);margin-bottom:14px">'+txt+'</div>' +
+      '<div class="note">Preferences saved — <strong style="color:var(--gr)">'+a.pl+' plan</strong> with <strong style="color:var(--gr)">'+a.gs+'</strong> will shape Goal Setting results.</div></div>';
+    msgBot('IC Advisory complete ✓<br><br>Recommended: <strong>'+a.pl+' quota</strong> with '+a.py.toLowerCase()+' pay mix and '+a.gs.toLowerCase()+' goal setting.<br><br>Full recommendation is on the <strong>left panel</strong>. Ready for <em>Goal Setting</em>?', []);
+    // store for Unit 2
+    S.ic.pl = a.pl; S.ic.gs = a.gs;
+  })
+  .catch(function(){
+    $('p1').innerHTML = '<div class="card"><div class="card-title">IC Advisory Result</div>' +
+      '<div style="font-size:13px;line-height:1.9;color:var(--tx)">Recommended: <strong>'+a.pl+' quota</strong> with <strong>'+a.py.toLowerCase()+' pay mix</strong> and <strong>'+a.gs.toLowerCase()+' goal setting</strong>. This aligns to your '+a.st.toLowerCase()+' lifecycle stage and '+a.ob.toLowerCase()+' objective.</div>' +
+      '<div class="note" style="margin-top:12px">Preferences saved for Goal Setting.</div></div>';
+    msgBot('IC Advisory complete. Recommended: <strong>'+a.pl+' quota</strong>, '+a.py.toLowerCase()+' pay, '+a.gs.toLowerCase()+' goals. Ready for Goal Setting?', []);
+    S.ic.pl = a.pl; S.ic.gs = a.gs;
+  });
+}
+
+
+// ══════════════════════════════════════════════
+// GOAL SETTING — Full conversational flow
+// Flow: file → column mapping → NF → 5 questions → pipeline
+// ══════════════════════════════════════════════
+
+// Column labels users see
+var GS_COL_LABELS = [
+  { key:'dateCol',    label:'Date column',           hint:'e.g. wk_end_dt, transaction_date, month',    which:'gs_date'    },
+  { key:'idCol',      label:'Territory ID column',   hint:'e.g. terr_id, territory_id',                 which:'gs_id'      },
+  { key:'nameCol',    label:'Territory Name column', hint:'e.g. terr_nm, territory_name (or same as ID)', which:'gs_name'  },
+  { key:'regionIdCol',label:'Region ID column',      hint:'e.g. regn_id, region_id',                    which:'gs_rid'     },
+  { key:'regionNmCol',label:'Region Name column',    hint:'e.g. regn_nm, region_name',                  which:'gs_rnm'     },
+  { key:'valueCol',   label:'Sales Value column',    hint:'e.g. sales, metric_value, revenue',          which:'gs_value'   },
+];
+var GS_COL_IDX = 0;  // which column we're currently asking about
+
+function startGS() {
+  if (S.gs.step > 0 && S.gs.step < 8) {
+    // Reset properly — don't block
+    S.gs = { step:0, file:null, lb:'12', nf:null, sm:'Run all methods', pm:'Run all splits', preset:'fairness',
+              dateCol:'', idCol:'', nameCol:'', regionIdCol:'', regionNmCol:'', valueCol:'' };
+  }
+  S.gs.step = 1;
+  S.busy = false; $('send-btn').disabled = false;
+  showTab(2);
+  $('p2').innerHTML =
+    '<div class="card"><div class="card-title">Goal Setting — Collecting Inputs</div>' +
+    '<div id="gs-prog"><div style="font-size:12px;color:var(--t2);margin-bottom:8px">Step 1 of 7 — Waiting for file…</div>' +
+    '<div class="prog-bar"><div class="prog-fill" id="gs-fill" style="width:3%"></div></div></div>' +
+    '<div id="gs-summary"></div></div>';
+
+  // If Forecasting already has a file, offer to use it
+  if (FC && FC.file) {
+    msgBot('<strong>Goal Setting</strong><br><br>I noticed you already uploaded <strong>' + FC.file.name + '</strong> in Forecasting. Would you like to use that file here?', []);
+    chips3([
+      ['Yes — use ' + FC.file.name + ' from Forecasting', 'use_fc'],
+      ['No — I want to upload a different file', 'upload_new']
+    ], function(lbl, val) {
+      msgUser(lbl);
+      if (val === 'use_fc') {
+        S.gs.file = FC.file; S.gs.fileName = FC.file.name;
+        // Pre-fill column mapping from forecasting session
+        if (FC.dateCol)  S.gs.dateCol  = FC.dateCol;
+        if (FC.idCol)    S.gs.idCol    = FC.idCol;
+        if (FC.valueCol) S.gs.valueCol = FC.valueCol;
+        gsDetectCols();
+      } else {
+        gsShowUpload();
+      }
+    });
+  } else {
+    gsShowUpload();
+  }
+}
+
+function gsShowUpload() {
+  msgBot('<strong>Goal Setting — Step 1 of 6</strong><br><br>Upload your sales data file.<br><br>' +
+    'One row per territory per month. Supports columns: <code>terr_id</code> <code>terr_nm</code> <code>regn_id</code> <code>regn_nm</code> <code>wk_end_dt</code> <code>sales</code> (or any names — I will ask you to map them).', []);
+  var w =
+    '<div class="chat-dz" id="cdz" ondragover="dzOver(event)" ondragleave="dzLeave()" ondrop="dzDrop(event)">' +
+    '<input type="file" id="gs-file" accept=".xlsx,.xls,.csv" onchange="fileChosen(this)"/>' +
+    '<div style="font-size:20px;color:var(--t3);margin-bottom:6px">⬆</div>' +
+    '<p><strong>Click to browse</strong> or drag file here</p>' +
+    '<p style="font-size:10px;color:var(--t3);margin-top:3px">.xlsx .xls .csv accepted</p>' +
+    '<div id="gs-fn" style="display:none;margin-top:6px;font-size:11px;color:var(--ok);font-family:var(--mono)"></div>' +
+    '</div>';
+  appendWidget(w);
+}
+
+function dzOver(e) { e.preventDefault(); var d=$('cdz'); if(d) d.classList.add('ov'); }
+function dzLeave()  { var d=$('cdz'); if(d) d.classList.remove('ov'); }
+function dzDrop(e)  {
+  e.preventDefault(); dzLeave();
+  var f = e.dataTransfer.files[0]; if (!f) return;
+  var inp = $('gs-file');
+  if (inp) { var dt=new DataTransfer(); dt.items.add(f); inp.files=dt.files; }
+  fileChosen({ files:[f] });
+}
+
+function fileChosen(inp) {
+  var f = inp.files[0]; if (!f) return;
+  S.gs.file = f; S.gs.fileName = f.name;
+  var dz = $('cdz'); if (dz) { dz.classList.remove('ov'); dz.classList.add('ok'); dz.style.pointerEvents='none'; }
+  var fn2 = $('gs-fn'); if (fn2) { fn2.style.display='block'; fn2.textContent='✓ '+f.name; }
+  msgUser('Uploaded: '+f.name);
+  gsDetectCols();
+}
+
+function gsDetectCols() {
+  updateGProgress('Parsing file…', 1, 8);
+  gsSummary();
+
+  // Run step1-parse immediately so we have quarter info before asking questions
+  var fd0 = new FormData();
+  fd0.append('file',           S.gs.file);
+  fd0.append('lookback_months','12');
+  fd0.append('date_col',   S.gs.dateCol   || 'wk_end_dt');
+  fd0.append('id_col',     S.gs.idCol     || 'terr_id');
+  fd0.append('value_col',  S.gs.valueCol  || 'sales');
+  fd0.append('name_col',   S.gs.nameCol   || 'terr_nm');
+  fd0.append('region_id_col', S.gs.regionIdCol || 'regn_id');
+  fd0.append('region_nm_col', S.gs.regionNmCol || 'regn_nm');
+
+  fetch('/api/goals/step1-parse', {method:'POST', body:fd0})
+  .then(function(r){ return r.ok ? r.json() : r.json().then(function(e){ throw new Error(e.detail||'Parse error'); }); })
+  .then(function(d) {
+    // Store parse_id so runGS reuses it instead of calling step1 again
+    S.gs._earlyParseId  = d.parse_id;
+    S.gs._totalH12      = d.total_h12 || 0;
+    S.gs._lastFullQ     = d.last_full_quarter  || null;
+    S.gs._nextQ         = d.next_quarter       || null;
+    S.gs._lastFullQL    = d.last_full_label    || d.last_full_quarter || '—';
+    S.gs._nextQL        = d.next_quarter_label || d.next_quarter      || '—';
+    S.gs._terrCount     = d.territory_count    || 0;
+    S.gs._suggestedNF   = d.suggested_nf       || 0;
+    S.gs._lastQTotal    = d.last_q_total       || 0;
+    S.gs._avgQoQGrowth  = d.avg_qoq_growth     || 0;
+    S.gs._suggestedNF   = d.suggested_nf       || 0;
+    S.gs._lastQTotal    = d.last_q_total       || 0;
+    S.gs._avgQoQGrowth  = d.avg_qoq_growth     || 0;
+
+    // Build column mapping confirmation
+    var colMsg = 'File received ✓ — <strong>' + d.territory_count + ' territories</strong>, ' +
+      '<strong>' + (d.total_h12 ? Math.round(d.total_h12).toLocaleString() : '—') + '</strong> total annual sales.<br>' +
+      'Columns auto-mapped: <code>wk_end_dt</code>→date · <code>terr_id</code>→territory · <code>sales</code>→value';
+    if (d.last_full_quarter) {
+      colMsg += '<br>Last complete quarter detected: <strong style="color:var(--am)">' + esc(d.last_full_label||d.last_full_quarter) + '</strong>';
+    }
+    msgBot(colMsg, []);
+    updateGProgress('File parsed ✓', 1, 8);
+    gsSummary();
+
+    // Render EDA dashboard immediately
+    renderEDA(d, d.territories || []);
+
+    setTimeout(function(){
+      askQuarterConfirm();
+    }, 600);
+  })
+  .catch(function(e) {
+    msgBot('Could not parse file: <strong>' + esc(e.message) + '</strong><br>Please check the file format and try again.', []);
+    updateGProgress('Parse failed', 0, 8);
+  });
+}
+
+function gsAskNextCol() {
+  // Skip cols that are already filled from FC session
+  var colDef = GS_COL_LABELS[GS_COL_IDX];
+  if (!colDef) {
+    // All done
+    appendNFWidget();
+    return;
+  }
+  var alreadySet = S.gs[colDef.key];
+  // Skip optional cols if we have a good guess
+  var optional = ['nameCol','regionIdCol','regionNmCol'];
+  if (alreadySet || (optional.indexOf(colDef.key) > -1 && S.gs._guesses && S.gs._guesses[colDef.key.replace('Col','_col')])) {
+    if (!alreadySet) S.gs[colDef.key] = S.gs._guesses[colDef.key.replace('Col','_col')] || '';
+    GS_COL_IDX++;
+    gsAskNextCol();
+    return;
+  }
+
+  var step = GS_COL_IDX + 1;
+  var total = GS_COL_LABELS.length;
+  msgBot('<strong>Column ' + step + ' of ' + total + ' — ' + colDef.label + '</strong><br><span style="font-size:11px;color:var(--t2)">' + colDef.hint + '</span>', []);
+
+  var cols = S.gs._cols || [];
+  if (cols.length) {
+    var h = '<div class="chips">';
+    cols.forEach(function(c) {
+      h += '<div class="chip" data-which="' + colDef.which + '" data-key="' + colDef.key + '" data-val="' + esc(c) + '" onclick="gsColPick(this)">' + esc(c) + '</div>';
+    });
+    // Add "same as territory ID" option for name col
+    if (colDef.key === 'nameCol' && S.gs.idCol) {
+      h += '<div class="chip" style="border-color:var(--t3)" data-which="' + colDef.which + '" data-key="' + colDef.key + '" data-val="' + esc(S.gs.idCol) + '" onclick="gsColPick(this)">Same as ID column</div>';
+    }
+    if (optional.indexOf(colDef.key) > -1) {
+      h += '<div class="chip" style="border-color:var(--t3)" data-which="' + colDef.which + '" data-key="' + colDef.key + '" data-val="__skip__" onclick="gsColPick(this)">Skip / auto-detect</div>';
+    }
+    h += '</div>';
+    appendWidget(h);
+  } else {
+    appendWidget('<div class="num-row"><input type="text" class="num-in" id="gscol_in" placeholder="' + colDef.hint.split('e.g.')[1].trim().split(',')[0] + '" />' +
+      '<button class="num-ok" data-key="' + colDef.key + '" onclick="gsColManual(this)">Confirm →</button></div>');
+  }
+  updateGProgress('Column ' + step + ' of ' + total, step, total + 2);
+}
+
+function gsColPick(el) {
+  var key = el.getAttribute('data-key');
+  var val = el.getAttribute('data-val');
+  var container = el.parentNode;
+  container.querySelectorAll('.chip').forEach(function(c){ c.style.pointerEvents='none'; c.style.opacity=(c===el?'1':'.35'); });
+  el.classList.add('sel');
+  if (val !== '__skip__') {
+    S.gs[key] = val;
+    msgUser(val);
+  } else {
+    S.gs[key] = '';
+    msgUser('Skip');
+  }
+  GS_COL_IDX++;
+  setTimeout(gsAskNextCol, 300);
+}
+
+function gsColManual(btn) {
+  var key = btn.getAttribute('data-key');
+  var inp = $('gscol_in'); if (!inp || !inp.value.trim()) { if(inp) inp.style.borderColor='var(--rd)'; return; }
+  var val = inp.value.trim();
+  inp.disabled = true; btn.disabled = true;
+  S.gs[key] = val;
+  msgUser(val);
+  GS_COL_IDX++;
+  setTimeout(gsAskNextCol, 300);
+}
+
+function appendNFWidget() {
+  var hint = S.gs._totalH12 ? ' (your last 12mo sales: ~' + fmt(Math.round(S.gs._totalH12)) + ')' : '';
+  msgBot('<strong>National Forecast</strong>' + hint + '<br><br>What is the total National revenue target for the plan period?', []);
+  var suggested = S.gs._suggestedNF || S.gs._lastQTotal || 0;
+  var placeholder = suggested ? 'e.g. ' + Math.round(suggested) : 'Enter quarterly target';
+  appendWidget('<div class="num-row"><input type="number" class="num-in" id="cnf" placeholder="' + placeholder + '" min="1" style="flex:1"/><button class="num-ok" onclick="submitNF()">Confirm →</button></div>' +
+    (suggested ? '<div style="font-size:10px;color:var(--t3);margin-top:4px">Suggested quarterly target based on trend: <strong style="color:var(--ac)">' + fmt(Math.round(suggested)) + '</strong></div>' : ''));
+  setTimeout(function(){ var el=$('cnf'); if(el) el.focus(); }, 200);
+}
+
+// ── Progress bar + summary panel helpers ─────────────────────────────────────
+function updateGProgress(label, step, total) {
+  var lel = $('gs-prog');
+  if (lel) {
+    var pct = total > 0 ? Math.round((step / total) * 100) : 3;
+    lel.innerHTML =
+      '<div style="font-size:12px;color:var(--t2);margin-bottom:8px">' + esc(label) + '</div>' +
+      '<div class="prog-bar"><div class="prog-fill" id="gs-fill" style="width:' + pct + '%"></div></div>';
+  }
+}
+
+function gsSummary() {
+  var el = $('gs-summary'); if (!el) return;
+  var g = S.gs;
+  var rows = [];
+  if (g._terrCount)        rows.push(['Territories', g._terrCount]);
+  if (g.planQuarterLabel)  rows.push(['Goal period', esc(g.planQuarterLabel)]);
+  if (g.nf)                rows.push(['National forecast', fmt(Math.round(g.nf))]);
+  if (g.sm)                rows.push(['Scoring method', esc(g.sm)]);
+  if (g.pm)                rows.push(['Plan mode', esc(g.pm)]);
+  if (!rows.length) return;
+  var h = '';
+  rows.forEach(function(r) {
+    h += '<div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:1px solid var(--b1)">' +
+         '<span style="color:var(--t3)">' + r[0] + '</span>' +
+         '<span style="color:var(--tx);font-weight:600">' + r[1] + '</span></div>';
+  });
+  el.innerHTML = h;
+}
+
+// ══════════════════════════════════════════════
+// NEW 6-QUESTION FLOW
+// Step 1: Quarter confirm (statement + Yes/No)
+// Step 2: National Forecast
+// Step 3: Scoring Method
+// Step 4: Plan Mode
+// Step 5: Hybrid split (conditional)
+// Step 6: Historical vs Equal Allocation
+// ══════════════════════════════════════════════
+
+function askQuarterConfirm() {
+  var lastQL = S.gs._lastFullQL || '—';
+  var nextQL = S.gs._nextQL     || '—';
+  var lastQ  = S.gs._lastFullQ  || '';
+  var nextQ  = S.gs._nextQ      || '';
+
+  if (!lastQ) {
+    // No quarter detected — skip straight to NF
+    S.gs.planQuarter = ''; S.gs.planQuarterLabel = 'Custom'; S.gs.goalPeriod = 'quarter';
+    askNF(); return;
+  }
+
+  // Statement + Yes/No
+  var lastMonth = lastQL.split('(')[1] ? lastQL.split('(')[1].replace(')','').split(' ')[1] : '';
+  var lastMonthYear = lastQL; // e.g. "2026Q1  (Jan-Mar 2026)"
+  var stmt = 'I can see your last sales data is from <strong>' + esc(lastMonthYear) + '</strong>. So I will set goals for <strong style="color:var(--ac)">' + esc(nextQL) + '</strong>. Does that sound right?';
+
+  msgBot(stmt, []);
+  chips3([
+    ['Yes — set goals for ' + nextQL, 'yes'],
+    ['No — choose a different quarter', 'no']
+  ], function(lbl, val) {
+    msgUser(lbl);
+    if (val === 'yes') {
+      S.gs.planQuarter      = nextQ;
+      S.gs.planQuarterLabel = nextQL;
+      S.gs.goalPeriod       = 'quarter';
+      gsSummary();
+      setTimeout(askNF, 400);
+    } else {
+      // Show all completed quarters as chips
+      askQuarterPicker();
+    }
+  });
+  updateGProgress('Step 1 of 6 — Quarter', 1, 7);
+}
+
+function askQuarterPicker() {
+  msgBot('Which quarter would you like to set goals for?', []);
+  // Build list of completed quarters from last 6 quarters
+  var lastQ = S.gs._lastFullQ || '';
+  if (!lastQ) { askNF(); return; }
+  var yr = parseInt(lastQ.slice(0,4)), qn = parseInt(lastQ.slice(-1));
+  var qlabels = {1:'Jan-Mar',2:'Apr-Jun',3:'Jul-Sep',4:'Oct-Dec'};
+  var opts = [];
+  // Show last 4 completed quarters
+  for (var i=0; i<4; i++) {
+    var q = qn - i; var y = yr;
+    if (q < 1) { q += 4; y -= 1; }
+    var label = y+'Q'+q+'  ('+qlabels[q]+' '+y+')';
+    opts.push([label, y+'Q'+q]);
+  }
+  chips3(opts, function(lbl, val) {
+    msgUser(lbl);
+    S.gs.planQuarter      = val;
+    S.gs.planQuarterLabel = lbl;
+    S.gs.goalPeriod       = 'quarter';
+    gsSummary();
+    setTimeout(askNF, 400);
+  });
+}
+
+function askNF() {
+  var qLabel      = S.gs.planQuarterLabel || 'the plan period';
+  var lastQTotal  = S.gs._lastQTotal   || S.gs._lastQActual || 0;
+  var suggestedNF = S.gs._suggestedNF  || 0;
+  var growthPct   = S.gs._avgQoQGrowth || S.gs._avgGrowthPct || 0;
+
+  var hint = '';
+  if (lastQTotal || suggestedNF) {
+    var growthStr = (growthPct >= 0 ? '+' : '') + Math.round(growthPct * 10) / 10 + '%';
+    hint = '<br><br><div style="background:var(--ac-light);border-radius:var(--r);padding:8px 12px;font-size:11px;margin-top:4px">' +
+      '<strong>Last quarter national actual:</strong> <strong style="color:var(--tx)">' + fmt(Math.round(lastQTotal)) + '</strong><br>' +
+      'Avg QoQ growth: <strong style="color:' + (growthPct>=0?'var(--ok)':'var(--rd)') + '">' + growthStr + '</strong><br>' +
+      '<strong>Suggested quarterly target: <span style="color:var(--ac)">' + fmt(Math.round(suggestedNF || lastQTotal)) + '</span></strong> — enter a number close to this range.</div>';
+  }
+
+  msgBot('<strong>Step 2 — National Forecast for ' + esc(qLabel) + '</strong>' + hint +
+    '<br><br>What is your <strong>quarterly</strong> revenue target? Enter the total you expect all territories to achieve in ' + esc(qLabel) + '.', []);
+  appendNFWidget();
+  updateGProgress('Step 2 of 6 — National Forecast', 2, 7);
+}
+
+function submitNF() {
+  var el = $('cnf') || $('gs-nf'); if (!el) return;
+  // Strip commas (Indian lakh format: 3,00,000) and spaces before parsing
+  var raw = (el.value || '').toString().replace(/,/g, '').replace(/\s/g, '');
+  var v = parseFloat(raw);
+  if (!v || v < 1) { el.style.borderColor='var(--rd)'; el.placeholder='Enter a valid number'; return; }
+
+  // Warn if NF is far outside the suggested quarterly range
+  var suggested = S.gs._suggestedNF || S.gs._lastQTotal || 0;
+  if (suggested > 0) {
+    var ratio = v / suggested;
+    if (ratio > 3 || ratio < 0.3) {
+      var warningDiv = el.parentElement.nextElementSibling;
+      if (!warningDiv || !warningDiv.classList.contains('nf-warn')) {
+        warningDiv = document.createElement('div');
+        warningDiv.className = 'nf-warn';
+        warningDiv.style.cssText = 'background:#fff3cd;border:1px solid #d18a17;border-radius:8px;padding:8px 12px;margin-top:6px;font-size:11px;color:#856404';
+        el.parentElement.insertAdjacentElement('afterend', warningDiv);
+      }
+      warningDiv.innerHTML = '<strong>\u26a0 Heads up:</strong> You entered <strong>' + fmt(Math.round(v)) + '</strong> but the suggested quarterly NF is <strong>' + fmt(Math.round(suggested)) + '</strong> (' + Math.round(ratio*10)/10 + 'x difference). If your target is intentionally ambitious, proceed. Otherwise check your number.<br><button onclick="confirmNF()" style="margin-top:4px;padding:3px 8px;font-size:10px;cursor:pointer;border:1px solid #d18a17;background:#fff;border-radius:4px">Proceed anyway</button> <button onclick="useNFSuggested(' + Math.round(suggested) + ')" style="margin-top:4px;padding:3px 8px;font-size:10px;cursor:pointer;border:1px solid #1668b8;background:#e6f1fb;border-radius:4px">Use suggested: ' + fmt(Math.round(suggested)) + '</button>';
+      return; // Don't proceed — let user confirm or use suggested
+    }
+  }
+
+  el.disabled = true; if (el.nextElementSibling) el.nextElementSibling.disabled = true;
+  S.gs.nf = v; S.NF = v;
+  msgUser('National Forecast: ' + fmt(v));
+  S.gs.step = 3; gsSummary();
+  setTimeout(askScoringMethod, 400);
+}
+
+function confirmNF() {
+  // Called when user clicks Proceed despite warning
+  var el = $('cnf') || $('gs-nf'); if (!el) return;
+  var raw = (el.value || '').toString().replace(/,/g, '');
+  var v = parseFloat(raw); if (!v || v < 1) return;
+  var warn = document.querySelector('.nf-warn'); if (warn) warn.remove();
+  el.disabled = true; if (el.nextElementSibling) el.nextElementSibling.disabled = true;
+  S.gs.nf = v; S.NF = v;
+  msgUser('National Forecast: ' + fmt(v) + ' (confirmed)');
+  S.gs.step = 3; gsSummary();
+  setTimeout(askScoringMethod, 400);
+}
+
+function useNFSuggested(suggested) {
+  var el = $('cnf') || $('gs-nf'); if (!el) return;
+  el.value = suggested;
+  el.style.borderColor = '';
+  var warn = document.querySelector('.nf-warn'); if (warn) warn.remove();
+  submitNF();
+}
+
+function askScoringMethod() {
+  msgBot('<strong>Step 3 — Scoring Method</strong><br><br>How should territory baselines be calculated?', []);
+  chips3([
+    ['Historical Sales Aggregate — sum of last 12 months', 'Historical Total — 12 months'],
+    ['Historical Sales Quarter-wise — weighted recent quarters', 'Quarter-wise Weighted — 12 months'],
+    ['Absolute Growth — last 4 quarters trend', 'Absolute Growth'],
+    ['Percent Growth — last 4 quarters % change', 'Percent Growth'],
+    ['No preference — run all methods', 'Run all methods'],
+  ], function(lbl, val) {
+    S.gs.sm = val; msgUser(lbl); gsSummary();
+    setTimeout(askPlanMode, 400);
+  });
+  updateGProgress('Step 3 of 6 — Scoring Method', 3, 7);
+}
+
+function askPlanMode() {
+  msgBot('<strong>Step 4 — Plan Mode</strong><br><br>How should goals be split between regional market share and individual territory history?', []);
+  chips3([
+    ['Regional — 100% based on regional share', 'Regional'],
+    ['Individual — 100% based on own history', 'Individual'],
+    ['Hybrid — blend of regional and individual', 'Hybrid'],
+    ['No preference — run all splits', 'Run all splits'],
+  ], function(lbl, val) {
+    S.gs.pm = val; msgUser(lbl); gsSummary();
+    if (val === 'Hybrid') {
+      setTimeout(askHybridSplit, 400);
+    } else {
+      setTimeout(askEqualAllocation, 400);
+    }
+  });
+  updateGProgress('Step 4 of 6 — Plan Mode', 4, 7);
+}
+
+function askHybridSplit() {
+  msgBot('<strong>Step 4b — Hybrid Split</strong><br><br>What mix of Regional vs Individual?', []);
+  chips3([
+    ['70% Regional / 30% Individual', '70/30'],
+    ['60% Regional / 40% Individual', '60/40'],
+    ['50% Regional / 50% Individual', '50/50'],
+    ['40% Regional / 60% Individual', '40/60'],
+    ['30% Regional / 70% Individual', '30/70'],
+  ], function(lbl, val) {
+    S.gs.hybridSplit = val; msgUser(lbl); gsSummary();
+    // Map split to plan mode string the engine understands
+    var splitMap = {
+      '70/30':'Hybrid 70/30','60/40':'Hybrid 60/40','50/50':'Hybrid 50/50',
+      '40/60':'Hybrid 40/60','30/70':'Hybrid 30/70'
+    };
+    S.gs.pm = splitMap[val] || ('Hybrid ' + val);
+    setTimeout(askEqualAllocation, 400);
+  });
+  updateGProgress('Step 4b — Hybrid Split', 4, 7);
+}
+
+function askEqualAllocation() {
+  msgBot('<strong>Step 5 — Goal Allocation</strong><br><br>Should goals be based on territory history, or distribute some equally across all territories?', []);
+  chips3([
+    ['100% Historical — fully based on territory data', '1.0'],
+    ['80% Historical / 20% Equal', '0.8'],
+    ['60% Historical / 40% Equal', '0.6'],
+    ['50% Historical / 50% Equal', '0.5'],
+    ['100% Equal — distribute evenly across all territories', '0.0'],
+  ], function(lbl, val) {
+    S.gs.histPct = parseFloat(val);
+    msgUser(lbl); gsSummary();
+    setTimeout(askForecastSource, 400);
+  });
+  updateGProgress('Step 5 of 6 — Allocation', 5, 7);
+}
+
+function askForecastSource() {
+  if (S.fcResults && S.fcResults.length && FC.file && S.gs.file && FC.file.name === S.gs.file.name) {
+    msgBot('<strong>Step 6 — Forecast Source</strong><br><br>I have forecast results from the Forecasting unit (' + S.fcResults.length + ' territories). Use those?', []);
+    chips3([
+      ['Yes — reuse forecast results (faster)', 'use_fc'],
+      ['No — run fresh 12-model competition', 'run_fresh']
+    ], function(lbl, val) {
+      msgUser(lbl);
+      S.gs._useFcResults = (val === 'use_fc');
+      S.gs.step = 8; gsSummary();
+      setTimeout(askPlanningQuarterFinal, 400);
+    });
+  } else {
+    S.gs._useFcResults = false;
+    S.gs.step = 8; gsSummary();
+    setTimeout(askPlanningQuarterFinal, 400);
+  }
+  updateGProgress('Step 6 of 6 — Forecast', 6, 7);
+}
+
+function askPlanningQuarterFinal() {
+  // All questions answered — summarise and confirm before running
+  updateGProgress('All inputs collected ✓', 7, 7);
+  gsSummary();
+  msgBot('<strong>Ready to run!</strong><br><br>Setting goals for <strong style="color:var(--ac)">' +
+    esc(S.gs.planQuarterLabel || 'selected quarter') + '</strong>. Running the pipeline now…', []);
+  setTimeout(runGS, 600);
+}
+
+
+// ── 3-step pipeline ────────────────────────────────────────────────
+function runGS() {
+  if (!S.gs.file) { startGS(); return; }
+  S.busy = true; $('send-btn').disabled = true;
+
+  var MODELS = ['Naive','Mean','Moving Average','Weighted MA','Linear Trend','Drift','Exp Trend','SES','Holt','Holt-Winters','Theta','Median','ARIMA','XGBoost','Poisson Trend'];
+  var statusBub = msgBot('⚡ <strong>Step 1 of 3</strong> — Parsing your sales data…', []);
+  var parseId = null;
+  var modelScores = {};
+
+  function setStatus(html2) {
+    var bub = statusBub ? statusBub.querySelector('.bubble') : null;
+    if (bub) bub.innerHTML = html2;
+  }
+
+  var fd1 = new FormData();
+  fd1.append('file',           S.gs.file);
+  fd1.append('lookback_months',S.gs.lb || '12');
+  fd1.append('date_col',       S.gs.dateCol   || 'transaction_date');
+  fd1.append('id_col',         S.gs.idCol     || 'territory_id');
+  fd1.append('value_col',      S.gs.valueCol  || 'metric_value');
+  fd1.append('name_col',       S.gs.nameCol   || S.gs.idCol || 'territory_id');
+  fd1.append('region_id_col',  S.gs.regionIdCol|| 'region_id');
+  fd1.append('region_nm_col',  S.gs.regionNmCol|| S.gs.regionIdCol || 'region_id');
+
+  // Reuse early parse_id from gsDetectCols if available (avoids double parse)
+  var _doStep1 = S.gs._earlyParseId
+    ? Promise.resolve({ parse_id: S.gs._earlyParseId, territory_count: S.gs._terrCount || '?',
+                        total_h12: S.gs._totalH12, last_full_quarter: S.gs._lastFullQ,
+                        next_quarter: S.gs._nextQ, last_full_label: S.gs._lastFullQL,
+                        territories: [] })
+    : fetch('/api/goals/step1-parse', { method:'POST', body:fd1 })
+        .then(function(r){ return r.ok ? r.json() : r.json().then(function(e){ throw new Error(e.detail||'Parse failed'); }); });
+
+  _doStep1
+  .then(function(d){
+    parseId = d.parse_id;
+    S.gs._totalH12   = d.total_h12    || S.gs._totalH12 || 0;
+    S.gs._lastFullQ  = d.last_full_quarter  || S.gs._lastFullQ  || null;
+    S.gs._nextQ      = d.next_quarter       || S.gs._nextQ      || null;
+    S.gs._lastFullQL = d.last_full_label    || S.gs._lastFullQL || '—';
+    S.gs._nextQL     = d.next_quarter_label || S.gs._nextQL     || '—';
+    setStatus('✓ <strong>Step 1 done</strong> — '+(d.territory_count||S.gs._terrCount||'?')+' territories.<br>⚡ <strong>Step 2 of 3</strong> — Running 12 forecast models…');
+    updateGProgress('Running forecasts…', 6, 8);
+
+    var gs2 = $('gs-summary');
+    if (gs2 && d.territories) {
+      var th = gs2.innerHTML + '<div style="margin-top:8px;font-size:9px;color:var(--t3);font-family:var(--mono);text-transform:uppercase">Territories</div>';
+      d.territories.slice(0,5).forEach(function(t){
+        th += '<div style="display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:1px solid var(--b1)"><span style="color:var(--t2)">'+esc(t.name)+'</span><span style="color:var(--t3)">'+esc(t.region)+'</span></div>';
+      });
+      if (d.territory_count>5) th += '<div style="font-size:9px;color:var(--t3);margin-top:3px">+ '+(d.territory_count-5)+' more</div>';
+      gs2.innerHTML = th;
+    }
+
+    // Reuse FC results if user chose that
+    if (S.gs._useFcResults && S.fcResults && S.fcResults.length) {
+      msgBot('Using Forecasting results ✓ — skipping model competition.', []);
+      return storePrecomputedForecasts(parseId, S.fcResults);
+    }
+    return runModels(parseId, MODELS, modelScores, setStatus);
+  })
+  .then(function(){
+    setStatus('✓ Models done.<br>⚡ <strong>Step 3 of 3</strong> — Scoring 252 scenarios…');
+    updateGProgress('Scoring scenarios…', 7, 8);
+    var fd3 = new FormData();
+    fd3.append('parse_id',         parseId);
+    fd3.append('national_forecast',S.gs.nf || S.NF || 2500000);
+    fd3.append('scoring_method',   S.gs.sm || 'Run all methods');
+    fd3.append('plan_mode',        S.gs.pm || 'Run all splits');
+    fd3.append('preset',           S.gs.preset || 'fairness');
+    fd3.append('ic_plan_type',     (S.ic&&S.ic.pl) || '');
+    fd3.append('ic_goal_setting',  (S.ic&&S.ic.gs) || '');
+    fd3.append('plan_quarter',     S.gs.planQuarter  || '');
+    fd3.append('hist_pct',         S.gs.histPct !== undefined ? S.gs.histPct : 1.0);
+    return fetch('/api/goals/step3-score', { method:'POST', body:fd3 })
+      .then(function(r){ return r.ok ? r.json() : r.json().then(function(e){ throw new Error(e.detail||'Score failed'); }); });
+  })
+  .then(function(d){
+    S.busy=false; $('send-btn').disabled=false; S.gs.step=0;
+    S.sid = d.session_id;
+    S._lastGsResult = d;
+    var pill = $('sess-pill'); if(pill){ pill.textContent='Session: '+d.session_id.substr(0,8)+'…'; pill.className='sess live'; }
+    updateGProgress('Complete ✓', 8, 8);
+    // Store territories directly from the result data
+    // Use unconstrained plan goals if available, else build from top5
+    var planGoals = (d.unconstrained_plan||{}).goals || (d.best||{}).goals || null;
+    if (planGoals && planGoals.length) {
+      S._territories = planGoals.map(function(g){
+        return { id:g.tid, territory_id:g.tid, name:g.tname||g.tid, goal:g.fg||0, fg:g.fg||0, fc:g.fc||g.fg||0 };
+      });
+    } else {
+      // Fetch from session API
+      fetch('/api/goals/session/'+d.session_id+'/all?page=1&size=200')
+      .then(function(r){return r.json();})
+      .then(function(sd){
+        var best = (sd.scenarios||[]).find(function(s){return s.is_best;});
+        if (best && best.goals && best.goals.length) {
+          S._territories = best.goals.map(function(g){
+            return { id:g.tid, territory_id:g.tid, name:g.tname||g.tid, goal:g.fg||0, fg:g.fg||0, fc:g.fc||g.fg||0 };
+          });
+        }
+      }).catch(function(){});
+    }
+    renderGSResult(d);
+    setStatus('✓ <strong>Goal Setting complete!</strong> Results are on the <strong>left panel</strong>.');
+  })
+  .catch(function(err){
+    S.busy=false; $('send-btn').disabled=false; S.gs.step=0;
+    setStatus('✗ Error: <strong>'+esc(String(err.message||err).substr(0,150))+'</strong>');
+    updateGProgress('Failed', 0, 8);
+  });
+}
+
+function storePrecomputedForecasts(parseId, fcResults) {
+  var fd = new FormData();
+  fd.append('parse_id',    parseId);
+  fd.append('model_name',  'Precomputed');
+  fd.append('precomputed', JSON.stringify(fcResults));
+  return fetch('/api/goals/step2-forecast', {method:'POST', body:fd})
+    .then(function(r){ return r.json(); }).catch(function(){ return {}; });
+}
+
+function runModels(parseId, models, scores, setStatus) {
+  var idx = 0;
+  function next() {
+    if (idx >= models.length) return Promise.resolve();
+    var model = models[idx++];
+    var pct   = Math.round(20 + (idx/models.length)*60);
+    var bar   = buildModelBar(idx, models.length, scores);
+    setStatus('⚡ <strong>Step 2 of 3</strong> — Model '+idx+'/'+models.length+': <strong>'+model+'</strong>'+bar);
+    updateGProgress('Running: '+model+' ('+idx+'/'+models.length+')', Math.round(6+(idx/models.length)*1), 8);
+    var fd = new FormData();
+    fd.append('parse_id',   parseId);
+    fd.append('model_name', model);
+    return fetch('/api/goals/step2-forecast', { method:'POST', body:fd })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ scores[model] = d.avg_wmape; return next(); })
+      .catch(function(){ scores[model] = 'err'; return next(); });
+  }
+  return next();
+}
+
+function buildModelBar(done, total, scores) {
+  var labels = ['Naive','Mean','Mov.Avg','Wtd.MA','LinTrend','Drift','ExpTrend','SES','Holt','Holt-W','Theta','Median','ARIMA','XGBoost','Poisson'];
+  var h = '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:6px">';
+  labels.slice(0,done).forEach(function(m,i){
+    var sc  = scores[Object.keys(scores)[i]];
+    var col = typeof sc==='number'?(sc<0.1?'var(--ok)':sc<0.2?'var(--am)':'var(--rd)'):'var(--rd)';
+    var lbl = typeof sc==='number'?parseFloat(sc).toFixed(2):'err';
+    h += '<span style="font-size:9px;font-family:var(--mono);padding:2px 5px;border-radius:20px;background:var(--p2);color:'+col+'">'+m+' '+lbl+'</span>';
+  });
+  return h+'</div>';
+}
+
+function renderGSResult(d) {
+  var b  = d.unconstrained_plan || d.best || {};
+  var adv= d.advisory_plan || null;
+  var fc = d.forecast_summary   || {};
+  var br = b.breakdown || {};
+  var h  = '';
+
+  // Auto-select best plan for comparison
+  S.selectedPlan = {
+    track_label: d.has_advisory && adv && !adv.message ? 'Advisory-Guided Plan' : 'Best Plan (Unconstrained)',
+    method:      b.method      || '—',
+    mode:        b.mode        || '—',
+    scenario_id: b.scenario_id || b.best_scenario_id || '—',
+    composite:   b.composite   || 0,
+    confidence:  b.confidence  || 0.5,
+    on_target:   b.on_target   || 0,
+    breakdown:   b.breakdown   || {}
+  };
+
+  // If advisory, show two plan cards
+  if (d.has_advisory && adv && !adv.message) {
+    h += '<div class="card"><div class="card-title">Two Plans Available — Pick One to Compare</div>';
+    h += '<div class="plan-grid">' + planCard(adv,'Advisory-Guided Plan','adv') + planCard(b,'Unconstrained Best Plan','unc') + '</div></div>';
+  }
+
+  h += '<div class="grid4">';
+  h += statCard('Scenarios', d.total_scenarios, (d.final_scenarios||'?')+' after pruning','c-gr');
+  h += statCard('Best Score', pf(b.composite||0), ({fairness:'Fairness',growth:'Growth',cost:'Cost'}[d.preset_used]||'')+' Mode','c-ok');
+  h += statCard('Territories', d.territory_count, (d.data_tier||'full')+' data tier','c-bl');
+  var modelWinStr = (function(){
+    if (!fc.model_wins) return 'Top: '+(fc.top_model||'—');
+    var wins = fc.model_wins;
+    var sorted = Object.keys(wins).sort(function(a,b){return wins[b]-wins[a];}).slice(0,3);
+    return sorted.map(function(m){return m+'×'+wins[m];}).join(' · ');
+  })();
+  h += statCard('Confidence', Math.round(parseFloat(fc.avg_confidence||0.5)*100)+'%', modelWinStr,'c-ok');
+  h += '</div>';
+
+  var sid = b.scenario_id||b.best_scenario_id||'—';
+  h += '<div class="best-card">';
+  // Pull weights from top5[0] which has the best scenario detail
+  var bestDetail = (d.top5 && d.top5[0]) ? d.top5[0] : {};
+  var wLabel = '';
+  if (bestDetail.w1 !== undefined || b.w1 !== undefined) {
+    var w1 = Math.round(((bestDetail.w1||b.w1||0))*100);
+    var w2 = Math.round(((bestDetail.w2||b.w2||0))*100);
+    var w3 = Math.round(((bestDetail.w3||b.w3||0))*100);
+    if (w1||w2||w3) wLabel = 'W1='+w1+'% (most recent) · W2='+w2+'% · W3='+w3+'% (oldest)';
+  }
+  var splitLabel = '';
+  var rs = bestDetail.rs !== undefined ? bestDetail.rs : (b.rs !== undefined ? b.rs : null);
+  var is_ = bestDetail.is_ !== undefined ? bestDetail.is_ : (b.is_ !== undefined ? b.is_ : null);
+  if (rs !== null && is_ !== null) {
+    splitLabel = 'Regional '+Math.round(rs*100)+'% / Individual '+Math.round(is_*100)+'%';
+  }
+  h += '<div class="best-tag">✓ THE ONE — Pareto Selected</div>';
+  h += '<div class="best-name">'+(b.method||'—')+' · '+(b.mode||'—')+'</div>';
+  if (wLabel || splitLabel) {
+    h += '<div style="font-size:10px;color:var(--t2);margin:2px 0 4px">';
+    if (wLabel) h += '<span style="margin-right:12px">⚖ '+wLabel+'</span>';
+    if (splitLabel) h += '<span>🔀 '+splitLabel+'</span>';
+    h += '</div>';
+  }
+  var periodLabel = S.gs.planQuarterLabel ? ' · <strong style="color:var(--am)">Goals for: '+esc(S.gs.planQuarterLabel)+'</strong>' : '';
+  h += '<div class="best-sub">Score '+pf(b.composite||0)+' · '+Math.round(parseFloat(b.confidence||0.5)*100)+'% confidence · <strong style="color:var(--ok)">'+(b.on_target||0)+' territories on target</strong>'+periodLabel+'</div>';
+  h += '<div class="metrics">';
+  var metricInfo = {
+    'P': ['Prop','Proportionality — Do bigger territories get bigger goals? Pearson correlation of goals vs territory size.'],
+    'A': ['Att','Attainability — % of territories where forecast is within ±15% of goal. Higher = more achievable plan.'],
+    'C': ['Con','Consistency — How uniform are goals within each region? 1.0 = perfectly consistent across a region.'],
+    'Ga': ['Grw','Growth Alignment — Do high-growth territories get proportionally higher goals? Pearson corr of trend vs goal growth.'],
+    'V': ['Vol','Volatility Penalty — Are high-volatility territories being over-stretched? 1.0 = no unfair stretch applied.'],
+    'K': ['Cst','Cost Efficiency — How close is total goals to your National Forecast? 1.0 = exact match.'],
+    'S': ['Sprd','Goal Spread — P90/P10 ratio of goals. 1.0 = well distributed, not too concentrated or spread.']
+  };
+  ['P','A','C','Ga','V','Vol','K','S'].forEach(function(k){
+    var info = metricInfo[k]; if (!info) return;
+    h += '<div class="metric" title="'+info[1]+'" style="cursor:help">';
+    h += '<div class="metric-k">'+info[0]+'</div>';
+    h += '<div class="metric-v">'+pf(br[k]||0)+'</div>';
+    h += '</div>';
+  });
+  h += '</div></div>';
+
+  // Pros & Cons — auto-generated from metric scores
+  if (br) {
+    var pros = [], cons = [];
+    var metricDefs = [
+      ['P',  br.P,  'Proportionality',   'Goals are sized to each territory based on historical contribution.', 'Goals may not reflect territory size differences.'],
+      ['A',  br.A,  'Attainability',     'Most territories can realistically hit their goal (within 15%).', 'Many territories have goals outside the realistic attainment range.'],
+      ['C',  br.C,  'Consistency',       'Goals are consistent within regions — fair across teammates.', 'Goal consistency within regions needs improvement.'],
+      ['Ga', br.Ga, 'Growth Alignment',  'High-growth territories are rewarded with proportionally higher goals.', 'Goals may not fully reflect territory growth trends.'],
+      ['V',  br.V,  'Volatility',        'Volatile territories are not being over-stretched.', 'Some high-volatility territories may have disproportionate goals.'],
+      ['K',  br.K,  'Cost Efficiency',   'Total goals exactly match the national forecast — no budget gap.', 'Total goals deviate from the national forecast target.'],
+      ['S',  br.S,  'Goal Spread',       'Goals are well distributed — no extreme concentration or spread.', 'Goal distribution across territories is uneven.']
+    ];
+    metricDefs.forEach(function(m) {
+      var score = parseFloat(m[1]||0);
+      if (score >= 0.80) pros.push({metric: m[2], score: m[1], text: m[3]});
+      else if (score < 0.55) cons.push({metric: m[2], score: m[1], text: m[4]});
+    });
+    h += '<div class="card">';
+    h += '<div class="card-title">Plan Assessment</div>';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    // Pros
+    h += '<div>';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--ok);margin-bottom:6px">✓ STRENGTHS</div>';
+    if (pros.length) {
+      pros.forEach(function(p) {
+        h += '<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start">';
+        h += '<div style="background:var(--ok);color:#fff;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px">'+pf(p.score)+'</div>';
+        h += '<div><div style="font-size:10px;font-weight:700;color:var(--tx)">'+p.metric+'</div>';
+        h += '<div style="font-size:10px;color:var(--t2)">'+p.text+'</div></div></div>';
+      });
+    } else {
+      h += '<div style="font-size:10px;color:var(--t3);font-style:italic">Run with a realistic NF to see strengths.</div>';
+    }
+    h += '</div>';
+    // Cons
+    h += '<div>';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--rd);margin-bottom:6px">⚠ WATCH-OUTS</div>';
+    if (cons.length) {
+      cons.forEach(function(c_) {
+        h += '<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start">';
+        h += '<div style="background:var(--rd);color:#fff;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px">'+pf(c_.score)+'</div>';
+        h += '<div><div style="font-size:10px;font-weight:700;color:var(--tx)">'+c_.metric+'</div>';
+        h += '<div style="font-size:10px;color:var(--t2)">'+c_.text+'</div></div></div>';
+      });
+    } else {
+      h += '<div style="font-size:10px;color:var(--t3);font-style:italic">No significant watch-outs.</div>';
+    }
+    h += '</div>';
+    h += '</div></div>';
+  }
+
+  // ── Territory Goals Table ─────────────────────────────────────
+  var tGoals = (d.unconstrained_plan||{}).goals || [];
+  if (tGoals.length) {
+    var qLabel = S.gs.planQuarterLabel ? '  (' + S.gs.planQuarterLabel + ')' : '';
+    h += '<div class="card"><div class="card-title">Territory Goals — Best Scenario' + qLabel + '</div>';
+    h += '<div style="max-height:280px;overflow-y:auto"><table style="width:100%"><thead><tr>';
+    h += '<th>Territory</th><th>Region</th><th>Quarterly Goal</th><th>Forecast Q2</th><th>Attainment</th><th>On Target</th><th>Best Model</th>';
+    h += '</tr></thead><tbody>';
+    tGoals.forEach(function(g) {
+      var displayGoal = g.fg || 0;
+      var fc = g.fc || 0;
+      var att = displayGoal > 0 ? Math.round(fc / displayGoal * 100) : 0;
+      var onTarget = att >= 85 && att <= 115;
+      // Look up best model from territory data if available
+      var bModel = (S._territories && S._territories.find(function(t){return t.territory_id===g.tid||t.id===g.tid;})||{}).best_model || '—';
+      h += '<tr>';
+      h += '<td style="font-family:var(--mono);color:var(--gr);font-size:10px">' + esc(g.tid) + '</td>';
+      h += '<td style="font-size:10px;color:var(--t2)">' + esc(g.tname||g.tid) + '</td>';
+      h += '<td style="font-family:var(--mono);color:var(--tx);font-weight:600">' + fmt(Math.round(displayGoal)) + '</td>';
+      h += '<td style="font-family:var(--mono);color:var(--bl)">' + fmt(Math.round(fc)) + '</td>';
+      h += '<td style="font-family:var(--mono);color:' + (att>=85&&att<=115?'var(--ok)':att<85?'var(--rd)':'var(--am)') + ';font-weight:600">' + att + '%</td>';
+      h += '<td>' + (onTarget ? '<span class="badge b-ok">✓</span>' : '<span class="badge b-rd">✗</span>') + '</td>';
+      h += '<td style="font-size:9px;color:var(--t3)">' + esc(bModel) + '</td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table></div></div>';
+  }
+
+  // ── Big CTA — comparison auto-loads ─────────────────────────────
+  h += '<div style="background:rgba(46,232,168,.08);border:1.5px solid rgba(46,232,168,.35);border-radius:12px;padding:16px;margin-top:14px">';
+  h += '<div style="font-size:13px;font-weight:700;color:var(--gr);margin-bottom:6px">✓ Goal Setting Complete</div>';
+  h += '<div style="font-size:11px;color:var(--t2);margin-bottom:12px">The best scenario is already loaded into Comparison. Click the button to go there now — sliders are ready.</div>';
+  h += '<div class="btn-row" style="flex-wrap:wrap">';
+  h += '<button class="btn pri" style="font-size:13px;padding:10px 20px" data-track="unc" onclick="goCompare(this.dataset.track)">→ Open Comparison (Unit 04)</button>';
+  h += '<button class="btn" onclick="doGuardrails()">Guardrails Check</button>';
+  h += '<button class="btn" id="gs-dl-btn" style="background:var(--gr);border-color:var(--gr);color:#000;font-weight:600" onclick="dlExcel(this.dataset.sid)" data-sid="'+d.session_id+'">⬇ Download Excel</button>';
+  h += '</div>';
+  if (d.has_advisory && adv && !adv.message) {
+    h += '<div style="font-size:11px;color:var(--t2);margin-top:8px">Two plan tracks: ';
+    h += '<button class="btn" style="padding:4px 10px;font-size:10px;margin-left:4px" data-track="adv" onclick="goCompare(this.dataset.track)">Advisory-Guided</button> ';
+    h += '<button class="btn" style="padding:4px 10px;font-size:10px" data-track="unc" onclick="goCompare(this.dataset.track)">Unconstrained</button></div>';
+  }
+  h += '</div>';
+  h += '<div id="exec-summary" style="margin-top:4px"></div>';
+  h += '<div id="gr-res" style="margin-top:10px"></div>';
+
+  $('p2').innerHTML = h;
+  showTab(2);
+  if (fc.model_wins) renderForecast(fc);
+  // Pre-populate comparison data right now from the response
+  var directGoals = (d.unconstrained_plan||{}).goals || (d.best||{}).goals || [];
+  if (directGoals.length) {
+    S._territories = directGoals.map(function(g){
+      return { id:g.tid, territory_id:g.tid, name:g.tname||g.tid,
+               goal:g.fg||0, fg:g.fg||0, fc:g.fc||g.fg||0,
+               best_model: g.best_model || '—' };
+    });
+  }
+  // Generate executive summary via Groq
+  generateExecSummary(d);
+}
+
+function generateExecSummary(d) {
+  var execDiv = document.getElementById('exec-summary');
+  if (!execDiv) return;
+  execDiv.innerHTML = '<div style="color:var(--t2);font-size:11px;padding:8px">Generating executive summary...</div>';
+  var b  = d.unconstrained_plan || d.best || {};
+  var fc = d.forecast_summary || {};
+  var br = b.breakdown || {};
+  var prompt = 'You are a senior IC consultant. Write a 4-sentence executive summary for this IC goal plan. ' +
+    'Quarter: ' + (S.gs.planQuarterLabel||'2026Q2') + '. ' +
+    'Method: ' + (b.method||'—') + '. Mode: ' + (b.mode||'—') + '. ' +
+    'National Forecast: ' + fmt(Math.round(S.gs.nf||0)) + '. ' +
+    'Total Territory Goals: ' + fmt(Math.round(b.total_goals||0)) + '. ' +
+    'Territories On Target: ' + (b.on_target||0) + ' of ' + (d.territory_count||0) + '. ' +
+    'Confidence: ' + Math.round(parseFloat(fc.avg_confidence||0.5)*100) + '%. ' +
+    'Top forecast model: ' + (fc.top_model||'—') + '. ' +
+    'Composite score: ' + pf(b.composite||0) + '. ' +
+    'Attainability: ' + pf(br.A||0) + '. Proportionality: ' + pf(br.P||0) + '. Consistency: ' + pf(br.C||0) + '. ' +
+    'Cover: what the plan recommends, why this scenario was selected, what attainability means for reps, and one key risk. Be direct, no filler.';
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      session_id: d.session_id || '',
+      chat_session_id: 'exec_' + (d.session_id||rand()),
+      message: prompt
+    })
+  })
+  .then(function(r){ return r.ok ? r.json() : null; })
+  .then(function(res) {
+    if (!res || !res.response) { execDiv.innerHTML = ''; return; }
+    execDiv.innerHTML =
+      '<div style="background:var(--p2);border:1px solid var(--b2);border-radius:10px;padding:14px;margin-top:10px">' +
+      '<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">⚡ Executive Summary</div>' +
+      '<div style="font-size:12px;color:var(--tx);line-height:1.7">' + md(res.response) + '</div>' +
+      '</div>';
+  })
+  .catch(function(){ execDiv.innerHTML = ''; });
+}
+
+function planCard(plan, label, cls) {
+  return '<div class="plan-card '+cls+'"><div class="plan-tag">'+label+'</div>' +
+    '<div class="plan-name">'+(plan.method||'—')+'</div>' +
+    '<div class="plan-sub">'+(plan.mode||'—')+' · Score '+pf(plan.composite||0)+' · '+(plan.on_target||0)+' on target</div>' +
+    '<button class="plan-btn" data-cls="'+cls+'" data-method="'+(plan.method||'')+'" data-mode="'+(plan.mode||'')+'" onclick="selectPlan(this.dataset.cls,this.dataset.method,this.dataset.mode)">Select this plan →</button></div>';
+}
+
+function selectPlan(cls, method, mode) {
+  document.querySelectorAll('.plan-btn').forEach(function(b){ b.disabled=true; b.style.opacity='.4'; });
+  var lbl = cls==='adv'?'Advisory-Guided Plan':'Unconstrained Plan';
+  var rd  = S._lastGsResult || {};
+  var pd  = cls==='adv' ? (rd.advisory_plan||rd.unconstrained_plan||rd.best||{}) : (rd.unconstrained_plan||rd.best||{});
+  S.selectedPlan = { track_label:lbl, method:method, mode:mode,
+    scenario_id: pd.scenario_id||pd.best_scenario_id||'—',
+    composite: pd.composite||0, confidence: pd.confidence||0.5,
+    on_target: pd.on_target||0, breakdown: pd.breakdown||{} };
+  goCompare(cls);
+}
+
+function goCompare(track) {
+  var rd  = S._lastGsResult || {};
+  var pd  = track==='adv' ? (rd.advisory_plan||rd.unconstrained_plan||rd.best||{}) : (rd.unconstrained_plan||rd.best||{});
+  var lbl = track==='adv' ? 'Advisory-Guided Plan' : 'Best Plan (Unconstrained)';
+
+  S.selectedPlan = {
+    track_label: lbl,
+    method:      pd.method      || '—',
+    mode:        pd.mode        || '—',
+    scenario_id: pd.scenario_id || pd.best_scenario_id || '—',
+    composite:   pd.composite   || 0,
+    confidence:  pd.confidence  || 0.5,
+    on_target:   pd.on_target   || 0,
+    breakdown:   pd.breakdown   || {}
+  };
+
+  // Always re-populate territories from the stored result
+  var goals = pd.goals || [];
+  if (goals.length) {
+    S._territories = goals.map(function(g){
+      return {
+        id:          g.tid,
+        territory_id:g.tid,
+        name:        g.tname || g.tid,
+        goal:        g.fg    || 0,
+        fg:          g.fg    || 0,
+        fc:          g.fc    || g.fg || 0,
+        forecast_q1: g.fc    || g.fg || 0
+      };
+    });
+  } else if (!S._territories || !S._territories.length) {
+    // Fallback: try unconstrained plan goals
+    var fallbackGoals = (rd.unconstrained_plan||{}).goals || [];
+    if (fallbackGoals.length) {
+      S._territories = fallbackGoals.map(function(g){
+        return { id:g.tid, territory_id:g.tid, name:g.tname||g.tid,
+                 goal:g.fg||0, fg:g.fg||0, fc:g.fc||g.fg||0 };
+      });
+    }
+  }
+
+  showTab(4);
+  buildSliders();
+}
+
+function statCard(l,v,s,c) { return '<div class="stat"><div class="stat-l">'+l+'</div><div class="stat-v '+c+'">'+v+'</div><div class="stat-s">'+s+'</div></div>'; }
+
+function dlExcel(sid) {
+  if (!sid) { msgBot('No session found. Please run Goal Setting first.', []); return; }
+  // Create a hidden anchor and click it to force download
+  var a = document.createElement('a');
+  a.href = '/api/export/session/' + sid + '/excel';
+  a.download = 'procdna_goals_' + sid.substr(0,8) + '.xlsx';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); }, 1000);
+}
+
+function dlCSV(sid) {
+  if (!sid) return;
+  var a = document.createElement('a');
+  a.href = '/api/export/session/' + sid + '/csv';
+  a.download = 'procdna_goals_' + sid.substr(0,8) + '.csv';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ document.body.removeChild(a); }, 1000);
+}
+
+
+// ══════════════════════════════════════════════
+// FORECAST (Unit 3) — Full Q&A flow + live model log
+// ══════════════════════════════════════════════
+var FC = { file:null, cols:[], dateCol:'wk_end_dt', idCol:'terr_id', valueCol:'sales', horizon:3, colsMapped:true };
+
+function startForecast() {
+  FC = { file:null, cols:[], dateCol:'', idCol:'', valueCol:'', horizon:3 };
+  showTab(3);
+  // If GS file already uploaded, offer to reuse
+  if (S.gs.file) {
+    msgBot('<strong>Standalone Forecasting</strong><br><br>You uploaded <strong>'+S.gs.file.name+'</strong> in Goal Setting. Use that file for forecasting?', []);
+    chips3([
+      ['Yes — use '+S.gs.file.name, 'use_gs'],
+      ['No — upload a different file', 'upload_fc']
+    ], function(lbl,val){
+      msgUser(lbl);
+      if (val === 'use_gs') {
+        FC.file = S.gs.file;
+        if (S.gs.dateCol)  FC.dateCol  = S.gs.dateCol;
+        if (S.gs.idCol)    FC.idCol    = S.gs.idCol;
+        if (S.gs.valueCol) FC.valueCol = S.gs.valueCol;
+        fcReadColsOrAsk();
+      } else {
+        fcShowUpload();
+      }
+    });
+  } else {
+    fcShowUpload();
+  }
+}
+
+function fcShowUpload() {
+  msgBot('<strong>Forecasting</strong><br><br>Upload your sales data. I will read the column names and ask you to map them.', []);
+  var w = '<div class="chat-dz" id="fdz" ondragover="fdzo(event)" ondragleave="fdzl()" ondrop="fdzd(event)">'+
+    '<input type="file" id="fc-file" accept=".xlsx,.xls,.csv" onchange="fcChosen(this)"/>'+
+    '<div style="font-size:20px;color:var(--t3);margin-bottom:5px">⬆</div>'+
+    '<p><strong>Click</strong> or drag file here</p>'+
+    '<p style="font-size:10px;color:var(--t3);margin-top:2px">.xlsx .xls .csv</p>'+
+    '<div id="fc-fn" style="display:none;margin-top:5px;font-size:11px;color:var(--ok);font-family:var(--mono)"></div></div>';
+  appendWidget(w);
+}
+function fdzo(e){e.preventDefault();var d=$('fdz');if(d)d.classList.add('ov');}
+function fdzl(){var d=$('fdz');if(d)d.classList.remove('ov');}
+function fdzd(e){e.preventDefault();fdzl();var f=e.dataTransfer.files[0];if(!f)return;var inp=$('fc-file');if(inp){var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;}fcChosen({files:[f]});}
+
+function fcChosen(inp) {
+  var f=inp.files[0];if(!f)return;
+  FC.file=f;
+  var dz=$('fdz');if(dz){dz.classList.add('ok');dz.style.pointerEvents='none';}
+  var fn=$('fc-fn');if(fn){fn.style.display='block';fn.textContent='✓ '+f.name;}
+  msgUser('Uploaded: '+f.name);
+  fcReadColsOrAsk();
+}
+
+function fcReadColsOrAsk() {
+  // Set Cabo defaults — backend auto-remaps these to standard names
+  FC.dateCol  = FC.dateCol  || 'wk_end_dt';
+  FC.idCol    = FC.idCol    || 'terr_id';
+  FC.valueCol = FC.valueCol || 'sales';
+  msgBot('File received ✓ Columns auto-mapped:<br>' +
+    '<code>wk_end_dt</code> → date · <code>terr_id</code> → territory · <code>sales</code> → value', []);
+  setTimeout(fcAskHorizon, 400);
+}
+
+var FC_COL_STEPS = [
+  { key:'dateCol',  label:'date column',      hint:'e.g. wk_end_dt, transaction_date' },
+  { key:'idCol',    label:'territory ID column', hint:'e.g. terr_id, territory_id'    },
+  { key:'valueCol', label:'sales value column', hint:'e.g. sales, metric_value'       },
+];
+var FC_COL_IDX = 0;
+
+function fcAskCols(idx) {
+  FC_COL_IDX = idx;
+  // Skip if already set
+  if (idx >= FC_COL_STEPS.length) { fcAskHorizon(); return; }
+  var step = FC_COL_STEPS[idx];
+  if (FC[step.key]) { fcAskCols(idx+1); return; }
+
+  msgBot('<strong>Step '+(idx+1)+' of 3 — Which is the <span style="color:var(--gr)">'+step.label+'</span>?</strong><br><span style="font-size:11px;color:var(--t2)">'+step.hint+'</span>', []);
+  var cols = FC.cols;
+  if (cols.length) {
+    var h = '<div class="chips">';
+    cols.forEach(function(c){
+      h += '<div class="chip" data-step="'+idx+'" data-key="'+step.key+'" data-val="'+esc(c)+'" onclick="fcColPick(this)">'+esc(c)+'</div>';
+    });
+    h += '</div>';
+    appendWidget(h);
+  } else {
+    appendWidget('<div class="num-row"><input type="text" class="num-in" id="fc_col_in" placeholder="'+step.hint.split(',')[0].replace('e.g. ','')+'"/><button class="num-ok" data-step="'+idx+'" data-key="'+step.key+'" onclick="fcColManual(this)">Confirm →</button></div>');
+  }
+}
+function fcColPick(el) {
+  var key  = el.getAttribute('data-key');
+  var val  = el.getAttribute('data-val');
+  var step = parseInt(el.getAttribute('data-step'));
+  var cont = el.parentNode;
+  cont.querySelectorAll('.chip').forEach(function(c){c.style.pointerEvents='none';c.style.opacity=(c===el?'1':'.35');});
+  el.classList.add('sel'); msgUser(val);
+  FC[key] = val;
+  setTimeout(function(){ fcAskCols(step+1); }, 300);
+}
+function fcColManual(btn) {
+  var key  = btn.getAttribute('data-key');
+  var step = parseInt(btn.getAttribute('data-step'));
+  var inp  = $('fc_col_in'); if(!inp||!inp.value.trim()){if(inp)inp.style.borderColor='var(--rd)';return;}
+  var val  = inp.value.trim(); inp.disabled=true; btn.disabled=true;
+  FC[key] = val; msgUser(val);
+  setTimeout(function(){ fcAskCols(step+1); }, 300);
+}
+
+function fcAskHorizon() {
+  msgBot('<strong>Forecast Horizon</strong><br><br>How many months ahead to forecast?', []);
+  chips3([['1 month','1'],['2 months','2'],['3 months (1 quarter)','3'],['6 months','6'],['12 months','12']],
+    function(lbl,val){ FC.horizon=parseInt(val); msgUser(lbl); runForecast(); });
+}
+
+function runForecast() {
+  if (!FC.file) { msgBot('No file uploaded. Please upload a file first.', []); return; }
+
+  var statusBub = msgBot('⚡ <strong>Step 1 of 2</strong> — Parsing file…', []);
+  function setStatus(h2) { var b=statusBub?statusBub.querySelector('.bubble'):null; if(b) b.innerHTML=h2; }
+
+  $('p3').innerHTML = '<div class="card"><div class="card-title">Forecast — Running</div>' +
+    '<div id="fc-log" style="font-size:10px;font-family:var(--mono);color:var(--t2);line-height:1.9"></div></div>';
+  function log(msg) { var el=$('fc-log'); if(el) el.innerHTML += '<div>'+msg+'</div>'; }
+
+  // ── Step 1: Parse file via step1-parse ─────────────────────────
+  var fd1 = new FormData();
+  fd1.append('file',           FC.file);
+  fd1.append('lookback_months','12');
+  fd1.append('date_col',   FC.dateCol  || 'wk_end_dt');
+  fd1.append('id_col',     FC.idCol    || 'terr_id');
+  fd1.append('value_col',  FC.valueCol || 'sales');
+
+  fetch('/api/goals/step1-parse', {method:'POST', body:fd1})
+  .then(function(r){
+    if (!r.ok) return r.text().then(function(t){ throw new Error(t.indexOf('<!')===-1?t:'Server error — wait 30s and retry'); });
+    return r.json();
+  })
+  .then(function(d){
+    var parseId = d.parse_id;
+    var terrCount = d.territory_count;
+    log('✓ Parsed <strong>'+terrCount+'</strong> territories');
+    setStatus('✓ Parsed '+terrCount+' territories.<br>⚡ <strong>Step 2 of 2</strong> — Running 12 forecast models…');
+
+    // ── Step 2: Run models one at a time ───────────────────────────
+    var MODELS = ['Naive','Mean','Moving Average','Weighted MA','Linear Trend',
+                  'Drift','Exp Trend','SES','Holt','Holt-Winters','Theta','Median','ARIMA','XGBoost','Poisson Trend'];
+    var scores = {};
+    var idx = 0;
+
+    function nextModel() {
+      if (idx >= MODELS.length) return buildFcResult(parseId, scores, terrCount);
+      var model = MODELS[idx++];
+      log('▶ <strong>'+model+'</strong>…');
+      setStatus('⚡ Model '+idx+'/'+MODELS.length+': <strong>'+model+'</strong>');
+
+      var fd2 = new FormData();
+      fd2.append('parse_id',   parseId);
+      fd2.append('model_name', model);
+      return fetch('/api/goals/step2-forecast', {method:'POST', body:fd2})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          scores[model] = d.avg_wmape;
+          var wm = typeof d.avg_wmape==='number' ? d.avg_wmape.toFixed(3) : '—';
+          var col = typeof d.avg_wmape==='number' ? (d.avg_wmape<0.1?'var(--ok)':d.avg_wmape<0.2?'var(--am)':'var(--rd)') : 'var(--t3)';
+          var lastDiv = $('fc-log').lastElementChild;
+          if (lastDiv) lastDiv.innerHTML = '✓ <strong>'+model+'</strong> — wMAPE <span style="color:'+col+';font-family:var(--mono)">'+wm+'</span>';
+          return nextModel();
+        })
+        .catch(function(){ scores[model]='err'; return nextModel(); });
+    }
+    return nextModel();
+  })
+  .catch(function(e){
+    setStatus('✗ Error: <strong>'+esc(e.message)+'</strong>');
+    msgBot('Forecast failed: '+esc(e.message), []);
+  });
+}
+
+function buildFcResult(parseId, scores, terrCount) {
+  // Step 3: Score (just for getting territory forecasts — skip scenario scoring)
+  var fd3 = new FormData();
+  fd3.append('parse_id',          parseId);
+  fd3.append('national_forecast', '1000000');
+  fd3.append('preset',            'fairness');
+
+  var statusBub = document.querySelector('.msg:last-of-type .bubble');
+  function setStatus(h2) { if(statusBub) statusBub.innerHTML=h2; }
+  setStatus('✓ All models done. Compiling results…');
+
+  fetch('/api/goals/step3-score', {method:'POST', body:fd3})
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    // Build summary from model scores + territory count
+    var wins = {};
+    var wmapeVals = Object.values(scores).filter(function(v){ return typeof v==='number'; });
+    var avgW = wmapeVals.length ? wmapeVals.reduce(function(a,b){return a+b;},0)/wmapeVals.length : 0.2;
+
+    // Determine winner per model from scores
+    Object.keys(scores).forEach(function(m){ wins[m] = 1; }); // placeholder
+    var topM = Object.keys(scores).filter(function(k){return typeof scores[k]==='number';})
+                .sort(function(a,b){return scores[a]-scores[b];})[0] || '—';
+
+    var fc = {
+      model_wins:      wins,
+      avg_wmape:       avgW.toFixed(4),
+      avg_confidence:  (1-avgW).toFixed(4),
+      top_model:       topM,
+    };
+
+    // Store forecast results from the step3 session
+    S.fcResults = (d.unconstrained_plan && d.unconstrained_plan.goals) ?
+      d.unconstrained_plan.goals.map(function(g){
+        return { territory_id:g.tid, fc_m1: (g.fc||0)/3, wmape_holdout: avgW,
+                 confidence: 1-avgW, best_model: topM, data_tier:'full' };
+      }) : [];
+
+    renderForecast(fc);
+    setStatus('✓ Forecast complete — <strong>'+terrCount+'</strong> territories. <a href="#" onclick="downloadFcExcel(event)">⬇ CSV</a>');
+
+    // Model score table
+    var tbl = '<div class="card"><div class="card-title">Model Competition Results</div>';
+    tbl += '<div class="table-wrap"><table><thead><tr><th>Model</th><th>Avg wMAPE</th><th>Quality</th></tr></thead><tbody>';
+    Object.keys(scores).sort(function(a,b){
+      var sa=typeof scores[a]==='number'?scores[a]:99;
+      var sb=typeof scores[b]==='number'?scores[b]:99;
+      return sa-sb;
+    }).forEach(function(m){
+      var sc2=scores[m];
+      var wm=typeof sc2==='number'?sc2.toFixed(3):'error';
+      var ql=typeof sc2==='number'?(sc2<0.1?'<span class="badge b-ok">Excellent</span>':sc2<0.2?'<span class="badge b-am">Good</span>':'<span class="badge b-rd">Moderate</span>'):'<span class="badge b-rd">Failed</span>';
+      tbl+='<tr><td><strong>'+esc(m)+'</strong></td><td style="font-family:var(--mono)">'+wm+'</td><td>'+ql+'</td></tr>';
+    });
+    tbl += '</tbody></table></div></div>';
+
+    // Territory-level forecast table
+    var goals4 = (d.unconstrained_plan||{}).goals || [];
+    if (goals4.length) {
+      tbl += '<div class="card"><div class="card-title">Territory Forecast Detail — '+goals4.length+' territories</div>';
+      tbl += '<button class="btn" style="margin-bottom:8px;font-size:11px" onclick="downloadFcExcel(null)">⬇ Download CSV</button>';
+      tbl += '<div class="table-wrap"><table><thead><tr>';
+      tbl += '<th>Territory</th><th>Region</th><th>Forecast (Annual)</th><th>Goal (Regional)</th><th>Attainment</th>';
+      tbl += '</tr></thead><tbody>';
+      goals4.forEach(function(g){
+        var fc = g.fc || 0;
+        var rg = g.rg || g.fg || 0;
+        var att = rg ? Math.round(fc/rg*100) : 0;
+        var col = att>=85&&att<=115?'var(--ok)':att<85?'var(--rd)':'var(--am)';
+        tbl += '<tr>';
+        tbl += '<td style="font-family:var(--mono);color:var(--gr);font-size:10px">'+esc(g.tid)+'</td>';
+        tbl += '<td style="font-size:10px;color:var(--t2)">'+esc(g.tname||g.tid)+'</td>';
+        tbl += '<td style="font-family:var(--mono);color:var(--bl)">'+fmt(Math.round(fc))+'</td>';
+        tbl += '<td style="font-family:var(--mono)">'+fmt(Math.round(rg))+'</td>';
+        tbl += '<td style="font-family:var(--mono);color:'+col+'">'+att+'%</td>';
+        tbl += '</tr>';
+      });
+      tbl += '</tbody></table></div></div>';
+      // Store for CSV download
+      S._fcRaw = goals4.map(function(g){
+        return {territory_id:g.tid,best_model:topM,wmape_holdout:avgW.toFixed(3),
+                confidence:(1-avgW).toFixed(3),data_tier:'full',fc_m1:(g.fc||0)/3};
+      });
+    }
+
+    $('p3').innerHTML = ($('p3').innerHTML||'') + tbl;
+
+    S._fcRaw = S.fcResults;
+
+    // Offer to use for Goal Setting
+    msgBot('Forecast complete for <strong>'+terrCount+'</strong> territories. Top model: <strong>'+topM+'</strong><br><br>Results on the left panel.', []);
+    chips3([
+      ['Run Goal Setting with this file →','gs_from_fc'],
+      ['Stay on Forecasting','fc_stay']
+    ], function(lbl,val){
+      msgUser(lbl);
+      if (val === 'gs_from_fc') {
+        S.gs = { step:1, file:FC.file, fileName:FC.file.name, lb:'12', nf:null,
+                 sm:'Run all methods', pm:'Run all splits', preset:'fairness',
+                 dateCol:FC.dateCol||'wk_end_dt', idCol:FC.idCol||'terr_id',
+                 valueCol:FC.valueCol||'sales', _useFcResults:true };
+        showTab(2);
+        $('p2').innerHTML =
+          '<div class="card"><div class="card-title">Goal Setting — Using Forecast File</div>' +
+          '<div id="gs-prog"><div style="font-size:12px;color:var(--t2);margin-bottom:8px">File set from Forecasting ✓</div>' +
+          '<div class="prog-bar"><div class="prog-fill" id="gs-fill" style="width:15%"></div></div></div>' +
+          '<div id="gs-summary"></div></div>';
+        gsSummary();
+        msgBot('<strong>Goal Setting</strong> — using <strong>'+FC.file.name+'</strong>.<br><br>' +
+          '<strong>National Forecast</strong> — what is the total revenue target? (e.g. 120000)', []);
+        appendNFWidget();
+        updateGProgress('Waiting for National Forecast…', 2, 8);
+      }
+    });
+  })
+  .catch(function(e){
+    msgBot('Results compilation failed: '+esc(e.message)+'. But forecast data is available.', []);
+  });
+}
+
+
+function downloadFcExcel(e) {
+  if (e) e.preventDefault();
+  if (!S._fcRaw || !S._fcRaw.length) { msgBot('No forecast data to export.', []); return; }
+  var hdr = 'Territory ID,Best Model,wMAPE,Confidence,Data Tier,Forecast monthly avg';
+  var body = S._fcRaw.map(function(r){
+    return [r.territory_id,r.best_model,r.wmape_holdout,r.confidence,r.data_tier,r.fc_m1]
+      .map(function(v){ return String(v == null ? '' : v); }).join(',');
+  });
+  var csv = [hdr].concat(body).join(String.fromCharCode(10));
+  var blob = new Blob([csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'forecast_results.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+function renderForecast(fc) {
+  var tot = fc.model_wins ? Object.values(fc.model_wins).reduce(function(a,b){return a+b;},0) : 0;
+  var h = '<div class="card"><div class="card-title">Forecast Model Competition Results</div>';
+  h += '<div class="grid4" style="grid-template-columns:repeat(3,1fr);margin-bottom:12px">';
+  h += statCard('Avg wMAPE',  pf(fc.avg_wmape||0),   'lower = better','c-am');
+  h += statCard('Confidence', Math.round(parseFloat(fc.avg_confidence||0.5)*100)+'%', '1 − wMAPE','c-ok');
+  h += statCard('Top Model',  fc.top_model||'—', 'most territories','c-gr');
+  h += '</div>';
+  if (fc.model_wins && Object.keys(fc.model_wins).length) {
+    h += '<div class="table-wrap"><table><thead><tr><th>Model</th><th>Territories Won</th><th>Share</th></tr></thead><tbody>';
+    var entries = Object.keys(fc.model_wins).map(function(k){ return [k, fc.model_wins[k]]; });
+    entries.sort(function(a,b){ return b[1]-a[1]; });
+    entries.forEach(function(kv){
+      var share = tot ? Math.round(kv[1]/tot*100) : 0;
+      h += '<tr><td><strong>'+esc(kv[0])+'</strong></td>'+
+           '<td style="font-family:var(--mono);color:var(--gr)">'+kv[1]+'</td>'+
+           '<td style="font-family:var(--mono)">'+share+'%</td></tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+  h += '</div>';
+  $('p3').innerHTML = ($('p3').innerHTML || '') + h;
+}
+
+
+// ══════════════════════════════════════════════
+// EDA DASHBOARD — renders on Unit 02 left panel after step1-parse
+// ══════════════════════════════════════════════
+function renderEDA(parseData, rawTerritories) {
+  var el = $('p2'); if (!el) return;
+
+  // Build data structures from parse response
+  var territories = parseData.territories || [];
+  var regions = {};
+  territories.forEach(function(t) {
+    if (!regions[t.region]) regions[t.region] = [];
+    regions[t.region].push(t);
+  });
+  var regionNames = Object.keys(regions).sort();
+
+  // Last 4 quarters from territory data (q1=Q1 of lookback etc.)
+  // We use q2,q3,q4 from territory features as quarterly totals
+  var lastQ   = parseData.last_full_quarter  || '';
+  var lastQL  = parseData.last_full_label    || lastQ;
+  var nextQ   = parseData.next_quarter       || '';
+  var nextQL  = parseData.next_quarter_label || nextQ;
+  var totalH12 = parseData.total_h12 || 0;
+
+  // Compute national quarterly from territory q2/q3/q4
+  var natQ1 = territories.reduce(function(a,t){return a+(t.q1||0);},0);
+  var natQ2 = territories.reduce(function(a,t){return a+(t.q2||0);},0);
+  var natQ3 = territories.reduce(function(a,t){return a+(t.q3||0);},0);
+  var natQ4 = territories.reduce(function(a,t){return a+(t.q4||0);},0);
+  var quarters = [natQ1,natQ2,natQ3,natQ4];
+  var qLabels  = ['Q1','Q2','Q3','Q4'];
+
+  // QoQ growths for suggestion
+  var growths = [];
+  for (var i=1;i<quarters.length;i++) {
+    if (quarters[i-1]>0) growths.push((quarters[i]-quarters[i-1])/quarters[i-1]*100);
+  }
+  var avgGrowth = growths.length ? growths.reduce(function(a,b){return a+b;},0)/growths.length : 0;
+  var suggestedNF = Math.round(natQ4 * (1 + avgGrowth/100));
+  // Store for NF question hint
+  S.gs._suggestedNF = suggestedNF;
+  S.gs._lastQActual  = natQ4;
+  S.gs._avgGrowthPct = Math.round(avgGrowth*10)/10;
+
+  var h = '<div style="padding:4px">';
+
+  // ── Header ──────────────────────────────────────────────────────
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
+  h += '<div><div style="font-size:13px;font-weight:700;color:var(--tx)">Sales Intelligence</div>';
+  h += '<div style="font-size:11px;color:var(--t2)">'+territories.length+' territories · '+regionNames.length+' regions · Last full quarter: <strong>'+esc(lastQL)+'</strong></div></div>';
+  h += '<div style="font-size:11px;color:var(--t3);font-family:var(--mono)">'+esc(lastQ)+'</div>';
+  h += '</div>';
+
+  // ── Stat strip ──────────────────────────────────────────────────
+  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">';
+  var g1 = growths[0]||0, g2=growths[1]||0, g3=growths[2]||0;
+  var statItems = [
+    ['Last Quarter',fmt(Math.round(natQ4)),'Total sales '+esc(lastQL)],
+    ['12-Month Total',fmt(Math.round(totalH12)),'Annual baseline'],
+    ['Avg QoQ Growth',(avgGrowth>=0?'+':'')+avgGrowth.toFixed(1)+'%','Last 3 quarters'],
+    ['Suggested NF',fmt(suggestedNF),'Next quarter target'],
+  ];
+  statItems.forEach(function(s){
+    h += '<div style="background:#fff;border:1px solid var(--b2);border-radius:var(--r);padding:10px 10px">';
+    h += '<div style="font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px">'+s[0]+'</div>';
+    h += '<div style="font-size:16px;font-weight:700;color:var(--ac)">'+s[1]+'</div>';
+    h += '<div style="font-size:9px;color:var(--t3);margin-top:2px">'+s[2]+'</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // ── Chart 1: Quarterly Bar Chart ────────────────────────────────
+  h += '<div style="background:#fff;border:1px solid var(--b2);border-radius:var(--r);padding:12px;margin-bottom:10px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ac)">Previous 4 Quarters</div>';
+  h += '<div style="display:flex;gap:6px">';
+  h += '<select class="eda-sel" id="eda-reg" onchange="edaUpdateChart()" style="font-size:10px;padding:3px 6px;border:1px solid var(--b2);border-radius:var(--r);color:var(--tx);background:var(--p2)">';
+  h += '<option value="">All Regions</option>';
+  regionNames.forEach(function(r){ h += '<option value="'+esc(r)+'">'+esc(r)+'</option>'; });
+  h += '</select>';
+  h += '<select class="eda-sel" id="eda-terr" onchange="edaUpdateChart()" style="font-size:10px;padding:3px 6px;border:1px solid var(--b2);border-radius:var(--r);color:var(--tx);background:var(--p2)">';
+  h += '<option value="">All Territories</option>';
+  territories.forEach(function(t){ h += '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>'; });
+  h += '</select>';
+  h += '</div></div>';
+  h += '<canvas id="eda-bar" height="120" style="width:100%"></canvas>';
+  h += '</div>';
+
+  // ── Chart 2: Territory Ranking ──────────────────────────────────
+  h += '<div style="background:#fff;border:1px solid var(--b2);border-radius:var(--r);padding:12px;margin-bottom:10px">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ac);margin-bottom:10px">Territory Ranking — Last Quarter</div>';
+  h += '<div id="eda-rank" style="max-height:200px;overflow-y:auto"></div>';
+  h += '</div>';
+
+  // ── Chart 3: Growth Heatmap ─────────────────────────────────────
+  h += '<div style="background:#fff;border:1px solid var(--b2);border-radius:var(--r);padding:12px;margin-bottom:10px">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ac);margin-bottom:10px">QoQ Growth Heatmap (all territories)</div>';
+  h += '<div id="eda-heat" style="overflow-x:auto"></div>';
+  h += '</div>';
+
+  // ── Chart 4: Volatility Scatter ─────────────────────────────────
+  h += '<div style="background:#fff;border:1px solid var(--b2);border-radius:var(--r);padding:12px;margin-bottom:10px">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ac);margin-bottom:6px">Size vs Stability</div>';
+  h += '<div style="font-size:9px;color:var(--t3);margin-bottom:8px">Each dot = one territory. Right = bigger, Up = more stable</div>';
+  h += '<canvas id="eda-scatter" height="160" style="width:100%"></canvas>';
+  h += '</div>';
+
+  // ── Chart 5: Region Summary Cards ──────────────────────────────
+  h += '<div style="background:#fff;border:1px solid var(--b2);border-radius:var(--r);padding:12px;margin-bottom:10px">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ac);margin-bottom:10px">Region Summary</div>';
+  h += '<div id="eda-regions"></div>';
+  h += '</div>';
+
+  h += '</div>';
+
+  el.innerHTML = h;
+
+  // Store data for dropdown updates
+  window._edaTerritories = territories;
+  window._edaRegions      = regions;
+  window._edaQuarters     = quarters;
+  window._edaQLabels      = qLabels;
+
+  // Render all charts
+  setTimeout(function(){
+    edaDrawBar(territories, quarters, qLabels);
+    edaDrawRank(territories);
+    edaDrawHeat(territories, qLabels);
+    edaDrawScatter(territories);
+    edaDrawRegions(regions, quarters);
+  }, 100);
+}
+
+function edaUpdateChart() {
+  var regSel  = $('eda-reg');
+  var terrSel = $('eda-terr');
+  if (!regSel || !terrSel) return;
+
+  var regVal  = regSel.value;
+  var terrVal = terrSel.value;
+  var all     = window._edaTerritories || [];
+
+  // Update territory dropdown based on region selection
+  if (regVal !== terrSel.getAttribute('data-reg')) {
+    terrSel.innerHTML = '<option value="">All Territories</option>';
+    var filtered = regVal ? all.filter(function(t){return t.region===regVal;}) : all;
+    filtered.forEach(function(t){ terrSel.innerHTML += '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>'; });
+    terrSel.setAttribute('data-reg', regVal);
+  }
+
+  // Filter territories for chart
+  var show = all;
+  if (terrVal) show = all.filter(function(t){return t.id===terrVal;});
+  else if (regVal) show = all.filter(function(t){return t.region===regVal;});
+
+  // Recompute quarters for selected set
+  var qs = [
+    show.reduce(function(a,t){return a+(t.q1||0);},0),
+    show.reduce(function(a,t){return a+(t.q2||0);},0),
+    show.reduce(function(a,t){return a+(t.q3||0);},0),
+    show.reduce(function(a,t){return a+(t.q4||0);},0),
+  ];
+  edaDrawBar(show, qs, window._edaQLabels || ['Q1','Q2','Q3','Q4']);
+}
+
+function edaDrawBar(territories, quarters, labels) {
+  var canvas = $('eda-bar'); if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.offsetWidth || 400; canvas.width = W; canvas.height = 120;
+  ctx.clearRect(0,0,W,120);
+
+  var maxV = Math.max.apply(null, quarters) || 1;
+  var bw = Math.floor((W - 40) / quarters.length) - 8;
+  var colors = ['#1668b8','#1faaa3','#d18a17','#1aa15a'];
+
+  quarters.forEach(function(v,i){
+    var x = 30 + i*(bw+8) + 4;
+    var h2 = Math.max(2, Math.round((v/maxV)*90));
+    var y = 100 - h2;
+
+    // Bar
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(x, y, bw, h2, 3) : ctx.rect(x, y, bw, h2);
+    ctx.fill();
+
+    // Label below
+    ctx.fillStyle = '#4a5b6e';
+    ctx.font = '9px Segoe UI';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[i]||('Q'+(i+1)), x + bw/2, 116);
+
+    // Value above bar
+    ctx.fillStyle = '#0f1d2e';
+    ctx.font = '8px Segoe UI';
+    ctx.fillText(fmt(Math.round(v)), x + bw/2, Math.max(10, y - 3));
+  });
+
+  // Y axis line
+  ctx.strokeStyle = '#e0e6ed'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(28,5); ctx.lineTo(28,104); ctx.stroke();
+}
+
+function edaDrawRank(territories) {
+  var el = $('eda-rank'); if (!el) return;
+  var sorted = territories.slice().sort(function(a,b){return (b.q4||0)-(a.q4||0);});
+  var maxV = sorted.length ? (sorted[0].q4||1) : 1;
+  var colors = ['#1668b8','#1faaa3','#d18a17','#1aa15a','#8e44ad','#d13b3b',
+                '#2980b9','#27ae60','#f39c12','#16a085','#c0392b'];
+  var regionColorMap = {};
+  var regions = [];
+  territories.forEach(function(t){ if (regions.indexOf(t.region)<0) regions.push(t.region); });
+  regions.sort().forEach(function(r,i){ regionColorMap[r]=colors[i%colors.length]; });
+
+  var h = '';
+  sorted.slice(0, 20).forEach(function(t, i) {
+    var pct = maxV ? Math.round((t.q4||0)/maxV*100) : 0;
+    var col = regionColorMap[t.region] || '#1668b8';
+    var q3 = t.q3||0, q4 = t.q4||0;
+    var growth = q3>0 ? Math.round((q4-q3)/q3*100) : 0;
+    var growCol = growth>0?'#1aa15a':growth<0?'#d13b3b':'#7d8a98';
+    h += '<div style="margin-bottom:5px">';
+    h += '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px">';
+    h += '<span style="color:var(--tx);font-weight:500">'+esc(t.name)+'</span>';
+    h += '<span style="display:flex;gap:8px"><span style="color:'+growCol+';font-family:var(--mono)">'+(growth>0?'+':'')+growth+'%</span>';
+    h += '<span style="font-family:var(--mono);color:var(--t2)">'+fmt(Math.round(t.q4||0))+'</span></span>';
+    h += '</div>';
+    h += '<div style="height:5px;background:var(--p3);border-radius:3px;overflow:hidden">';
+    h += '<div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:3px;transition:width .4s"></div>';
+    h += '</div></div>';
+  });
+  if (sorted.length > 20) h += '<div style="font-size:9px;color:var(--t3);margin-top:4px">+ '+(sorted.length-20)+' more territories</div>';
+  el.innerHTML = h;
+}
+
+function edaDrawHeat(territories, labels) {
+  var el = $('eda-heat'); if (!el) return;
+  // Show top 15 territories by q4 sales
+  var sorted = territories.slice().sort(function(a,b){return (b.q4||0)-(a.q4||0);}).slice(0,15);
+
+  var h = '<table style="border-collapse:collapse;width:100%;font-size:9px">';
+  h += '<thead><tr><th style="text-align:left;padding:3px 6px;color:var(--t3);font-weight:500">Territory</th>';
+  ['Q1→Q2','Q2→Q3','Q3→Q4'].forEach(function(l){
+    h += '<th style="padding:3px 6px;color:var(--t3);font-weight:500">'+l+'</th>';
+  });
+  h += '</tr></thead><tbody>';
+
+  sorted.forEach(function(t){
+    var qs = [t.q1||0, t.q2||0, t.q3||0, t.q4||0];
+    h += '<tr>';
+    h += '<td style="padding:3px 6px;color:var(--tx);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis">'+esc(t.name)+'</td>';
+    for (var i=1;i<4;i++) {
+      var g = qs[i-1]>0 ? Math.round((qs[i]-qs[i-1])/qs[i-1]*100) : 0;
+      var intensity = Math.min(100, Math.abs(g)*3);
+      var bg = g>0
+        ? 'rgba(26,161,90,'+( 0.1+intensity/200)+')'
+        : g<0
+          ? 'rgba(209,59,59,'+(0.1+intensity/200)+')'
+          : 'rgba(125,138,152,0.1)';
+      h += '<td style="padding:3px 6px;text-align:center;background:'+bg+';color:var(--tx);font-family:var(--mono)">'+(g>0?'+':'')+g+'%</td>';
+    }
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  if (territories.length > 15) h += '<div style="font-size:9px;color:var(--t3);margin-top:4px">Showing top 15 by last-quarter sales</div>';
+  el.innerHTML = h;
+}
+
+function edaDrawScatter(territories) {
+  var canvas = $('eda-scatter'); if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.offsetWidth || 400; canvas.width = W; canvas.height = 160;
+  ctx.clearRect(0,0,W,160);
+
+  var avgQ4s = territories.map(function(t){return t.q4||0;});
+  var maxQ = Math.max.apply(null,avgQ4s)||1;
+
+  // Compute CV proxy from q2,q3,q4
+  territories.forEach(function(t){
+    var vals = [t.q2||0,t.q3||0,t.q4||0];
+    var mean = vals.reduce(function(a,b){return a+b;},0)/3;
+    var std  = Math.sqrt(vals.reduce(function(a,b){return a+Math.pow(b-mean,2);},0)/3);
+    t._cv = mean>0 ? std/mean : 0;
+  });
+  var maxCV = Math.max.apply(null, territories.map(function(t){return t._cv;})) || 1;
+
+  // Quadrant lines
+  ctx.strokeStyle='#e0e6ed'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(W/2,10); ctx.lineTo(W/2,150); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(30,80);  ctx.lineTo(W-10,80); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Quadrant labels
+  ctx.font='8px Segoe UI'; ctx.fillStyle='#b3bcc7';
+  ctx.fillText('Small / Volatile', 34, 22);
+  ctx.fillText('Big / Volatile',   W/2+4, 22);
+  ctx.fillText('Small / Stable',   34, 148);
+  ctx.fillText('Big / Stable',     W/2+4, 148);
+
+  // Plot dots
+  territories.forEach(function(t){
+    var x = 30 + ((t.q4||0)/maxQ) * (W-40);
+    var y = 10 + (t._cv/maxCV) * 130;
+    var r = 4;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = t._cv>0.3?'rgba(209,59,59,.7)':'rgba(22,104,184,.6)';
+    ctx.fill();
+  });
+
+  // Y axis
+  ctx.font='8px Segoe UI'; ctx.fillStyle='#7d8a98'; ctx.textAlign='right';
+  ctx.fillText('High CV',  26, 22);
+  ctx.fillText('Low CV',   26, 148);
+}
+
+function edaDrawRegions(regions, quarters) {
+  var el = $('eda-regions'); if (!el) return;
+  var h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">';
+  var colors = ['#1668b8','#1faaa3','#d18a17','#1aa15a','#8e44ad','#d13b3b',
+                '#2980b9','#27ae60','#f39c12','#16a085','#c0392b'];
+  var allRegions = Object.keys(regions).sort();
+  allRegions.forEach(function(reg, ri) {
+    var terrs = regions[reg];
+    var tot = terrs.reduce(function(a,t){return a+(t.q4||0);},0);
+    var prev= terrs.reduce(function(a,t){return a+(t.q3||0);},0);
+    var growth = prev>0 ? Math.round((tot-prev)/prev*100) : 0;
+    var col = colors[ri%colors.length];
+    var growCol = growth>=0?'#1aa15a':'#d13b3b';
+    h += '<div style="border:1px solid var(--b2);border-radius:var(--r);padding:10px;border-top:3px solid '+col+'">';
+    h += '<div style="font-size:9px;font-weight:700;color:var(--tx);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(reg)+'</div>';
+    h += '<div style="font-size:15px;font-weight:700;color:'+col+';margin-bottom:2px">'+fmt(Math.round(tot))+'</div>';
+    h += '<div style="font-size:9px;color:var(--t3)">'+terrs.length+' territories · <span style="color:'+growCol+'">'+(growth>=0?'+':'')+growth+'% QoQ</span></div>';
+    h += '</div>';
+  });
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+
+// ══════════════════════════════════════════════
+// COMPARISON SLIDERS (Unit 4)
+// Left: selected plan metrics. Right: sliders.
+// ══════════════════════════════════════════════
+var CUST = {n:20, r:40, i:40, w1:20, w2:30, w3:50};
+
+function loadComparisonData() {
+  // 1. Try local memory first (fastest)
+  var hasLocal = S.selectedPlan && S.selectedPlan.scenario_id && S.selectedPlan.scenario_id !== '—'
+                 && S._territories && S._territories.length > 0;
+  if (hasLocal) { buildSliders(); return; }
+
+  // 2. Try restoring from S._lastGsResult (in-memory from this session)
+  if (S._lastGsResult) {
+    var unc = S._lastGsResult.unconstrained_plan || S._lastGsResult.best || {};
+    if (unc.scenario_id || unc.best_scenario_id) {
+      S.selectedPlan = {
+        track_label: 'Best Plan (Unconstrained)',
+        method:      unc.method      || '—',
+        mode:        unc.mode        || '—',
+        scenario_id: unc.scenario_id || unc.best_scenario_id || '—',
+        composite:   unc.composite   || 0,
+        confidence:  unc.confidence  || 0.5,
+        on_target:   unc.on_target   || 0,
+        breakdown:   unc.breakdown   || {}
+      };
+    }
+    var gls = unc.goals || [];
+    if (gls.length) {
+      S._territories = gls.map(function(g){
+        return {id:g.tid, territory_id:g.tid, name:g.tname||g.tid,
+                goal:g.fg||0, fg:g.fg||0, fc:g.fc||g.fg||0};
+      });
+      buildSliders(); return;
+    }
+  }
+
+  // 3. Fetch from server using session ID (handles page refresh / Render restart)
+  if (S.sid) {
+    $('p4').innerHTML = '<div class="note" style="color:var(--am)">⏳ Loading comparison data from session…</div>';
+    $('slider-body').innerHTML = '<div class="note" style="color:var(--am)">⏳ Loading…</div>';
+    fetch('/api/session/' + S.sid + '/summary')
+    .then(function(r) {
+      if (!r.ok) throw new Error('Session expired — please re-run Goal Setting.');
+      return r.json();
+    })
+    .then(function(d) {
+      S.selectedPlan = {
+        track_label: 'Best Plan (from session)',
+        method:      d.method      || '—',
+        mode:        d.mode        || '—',
+        scenario_id: d.scenario_id || '—',
+        composite:   d.composite   || 0,
+        confidence:  d.confidence  || 0.5,
+        on_target:   d.on_target   || 0,
+        breakdown:   d.breakdown   || {}
+      };
+      if (d.goals && d.goals.length) {
+        S._territories = d.goals.map(function(g){
+          return {id:g.tid, territory_id:g.tid, name:g.tname||g.tid,
+                  goal:g.fg||0, fg:g.fg||0, fc:g.fc||g.fg||0};
+        });
+      }
+      buildSliders();
+    })
+    .catch(function(e) {
+      $('p4').innerHTML = '<div class="note" style="color:var(--rd)">⚠ ' + esc(e.message) + '<br><br>Go to <strong>Unit 02 Goal Setting</strong> and run Goal Setting to generate comparison data.</div>';
+      $('slider-body').innerHTML = '<div class="note">Run Goal Setting first.</div>';
+    });
+    return;
+  }
+
+  // 4. Nothing available
+  buildSliders(); // will show "select a plan" message
+}
+
+function buildSliders(){
+  var plan = S.selectedPlan || null;
+  var terrs= S._territories  || [];
+
+  // ── LEFT PANEL ───────────────────────────────────────────────────
+  var lh = '';
+
+  if (plan && plan.scenario_id && plan.scenario_id !== '—') {
+    var br = plan.breakdown || {};
+    lh += '<div class="card"><div class="card-title">Selected Plan — '+esc(plan.track_label||'Best Plan')+'</div>';
+    lh += '<div class="best-card" style="margin-bottom:10px">';
+    lh += '<div class="best-tag">✓ '+esc(plan.scenario_id)+'</div>';
+    lh += '<div class="best-name">'+esc(plan.method||'—')+' · '+esc(plan.mode||'—')+'</div>';
+    lh += '<div class="best-sub">Score '+pf(plan.composite||0)+' · '+Math.round(parseFloat(plan.confidence||0.5)*100)+'% confidence · <strong style="color:var(--ok)">'+(plan.on_target||0)+' territories on target</strong></div>';
+    lh += '<div class="metrics">';
+    [['P','Prop'],['A','Att'],['C','Con'],['Ga','Grw'],['V','Vol'],['K','Cst'],['S','Sprd']].forEach(function(km){
+      lh += '<div class="metric"><div class="metric-k">'+km[1]+'</div><div class="metric-v c-gr">'+pf(br[km[0]]||0)+'</div></div>';
+    });
+    lh += '</div></div>';
+  } else {
+    lh += '<div class="note">No plan selected yet.<br><br>Run <strong>Goal Setting</strong> first, then click <strong>→ Open Comparison</strong> in the results — it will auto-populate here.</div>';
+  }
+
+  // Custom scenario stats
+  lh += '<div class="card"><div class="card-title">Custom Scenario Preview</div><div id="cmp-stats"><div style="font-size:12px;color:var(--t2)">Adjust sliders → to build your custom scenario</div></div></div>';
+
+  // Bar chart comparison
+  lh += '<div id="cmp-bars"></div>';
+
+  if (S.sid) {
+    lh += '<div class="btn-row" style="margin-top:8px">';
+    lh += '<button class="btn pri" onclick="dlExcel(S.sid)">⬇ Excel</button>';
+    lh += '<button class="btn" onclick="dlCSV(S.sid)">⬇ CSV</button>';
+    lh += '<button class="btn" onclick="doGuardrails()">Guardrails</button>';
+    lh += '<button class="btn" onclick="doDelta()">Delta Insights</button>';
+    lh += '</div>';
+    lh += '<div id="gr-res4" style="margin-top:10px"></div><div id="dl-res4" style="margin-top:10px"></div>';
+  }
+  $('p4').innerHTML = lh;
+
+  // ── RIGHT PANEL (slider-body) ─────────────────────────────────────
+  var sok = (CUST.n+CUST.r+CUST.i) === 100;
+  var wok = (CUST.w1+CUST.w2+CUST.w3) === 100;
+
+  function sl(id, lbl, val, col, mn, mx, note2) {
+    return '<div class="sl-row">' +
+      '<div class="sl-label"><span>'+lbl+'</span><span id="v_'+id+'">'+val+'%</span></div>' +
+      '<input type="range" id="s_'+id+'" min="'+mn+'" max="'+mx+'" step="5" value="'+val+'"' +
+      ' data-key="'+id+'" style="accent-color:'+col+'" oninput="slMove(this.dataset.key)">' +
+      '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);color:var(--t3);margin-top:2px">' +
+      '<span>min '+mn+'%</span><span>max '+mx+'%</span></div>' +
+      (note2 ? '<div style="font-size:9px;color:var(--t3);margin-top:1px">'+note2+'</div>' : '') +
+      '</div>';
+  }
+
+  var rh = '';
+  rh += '<div class="card">';
+  rh += '<div class="card-title">Goal Split <span id="sw" style="color:'+(sok?'var(--ok)':'var(--rd)')+';">'+(sok?'✓ sums to 100%':'⚠ must sum to 100%')+'</span></div>';
+  rh += '<div class="note" style="margin-bottom:10px;font-size:11px">N + R + I = 100%. Changing one auto-adjusts the others.</div>';
+  rh += sl('n','National (N)', CUST.n, 'var(--t2)', 0, 40, 'Share from national target');
+  rh += sl('r','Regional (R)', CUST.r, 'var(--am)', 0, 80, 'Share from regional pool');
+  rh += sl('i','Individual (I)',CUST.i,'var(--gr)', 0,100, 'Share from own history');
+  rh += '</div>';
+
+  rh += '<div class="card">';
+  rh += '<div class="card-title">Quarter Weights <span id="ww" style="color:'+(wok?'var(--ok)':'var(--rd)')+';">'+(wok?'✓ sums to 100%':'⚠ must sum to 100%')+'</span></div>';
+  rh += '<div class="note" style="margin-bottom:10px;font-size:11px">W1 + W2 + W3 = 100%. Range 5–70% each. Changing W1 or W2 auto-adjusts W3.</div>';
+  rh += sl('w1','W1 — Q2 Weight',CUST.w1,'var(--gr)',5,70,'Q2 sales weight');
+  rh += sl('w2','W2 — Q3 Weight',CUST.w2,'var(--bl)',5,70,'Q3 sales weight');
+  rh += sl('w3','W3 — Q4 Weight',CUST.w3,'var(--am)',5,70,'Q4 weight (auto-adjusts)');
+  rh += '</div>';
+
+  rh += '<div class="card"><div class="card-title">Quick Presets</div>';
+  rh += '<div class="btn-row" style="flex-wrap:wrap">';
+  rh += '<button class="btn" onclick="applyCustPreset(20,40,40,20,30,50)">Default 60/40</button>';
+  rh += '<button class="btn" onclick="applyCustPreset(0,0,100,33,33,34)">Full Individual</button>';
+  rh += '<button class="btn" onclick="applyCustPreset(0,60,40,20,30,50)">Regional 60/40</button>';
+  rh += '<button class="btn" onclick="applyCustPreset(0,70,30,25,35,40)">Regional 70/30</button>';
+  rh += '<button class="btn" onclick="applyCustPreset(10,60,30,15,35,50)">Balanced</button>';
+  rh += '</div></div>';
+
+  $('slider-body').innerHTML = rh;
+  updateCmp();
+}
+
+function applyCustPreset(n,r,i,w1,w2,w3) {
+  CUST.n=n; CUST.r=r; CUST.i=i; CUST.w1=w1; CUST.w2=w2; CUST.w3=w3;
+  // Sync all sliders
+  ['n','r','i','w1','w2','w3'].forEach(function(k){
+    var s=$('s_'+k), v=$('v_'+k);
+    if(s) s.value = CUST[k];
+    if(v) v.textContent = CUST[k]+'%';
+  });
+  var sok=(CUST.n+CUST.r+CUST.i)===100, wok=(CUST.w1+CUST.w2+CUST.w3)===100;
+  var sw=$('sw'), ww=$('ww');
+  if(sw){sw.style.color=sok?'var(--ok)':'var(--rd)'; sw.textContent=sok?'✓ sums to 100%':'⚠ must sum to 100%';}
+  if(ww){ww.style.color=wok?'var(--ok)':'var(--rd)'; ww.textContent=wok?'✓ sums to 100%':'⚠ must sum to 100%';}
+  updateCmp();
+}
+
+function slMove(key) {
+  var s = $('s_'+key); if (!s) return;
+  CUST[key] = parseInt(s.value);
+  var v = $('v_'+key); if (v) v.textContent = CUST[key]+'%';
+
+  // Auto-balance goal split (N+R+I = 100)
+  if (['n','r','i'].indexOf(key) > -1) {
+    var others = ['n','r','i'].filter(function(k){ return k !== key; });
+    var need   = 100 - CUST[key];
+    var cur    = CUST[others[0]] + CUST[others[1]];
+    if (cur === 0) {
+      CUST[others[0]] = Math.round(need/2);
+      CUST[others[1]] = need - CUST[others[0]];
+    } else {
+      CUST[others[0]] = Math.round(CUST[others[0]] / cur * need);
+      CUST[others[1]] = need - CUST[others[0]];
+    }
+    CUST.n = Math.min(40,  Math.max(0,   CUST.n));
+    CUST.r = Math.min(80,  Math.max(0,   CUST.r));
+    CUST.i = Math.min(100, Math.max(0,   CUST.i));
+    ['n','r','i'].forEach(function(k){
+      var el=$('s_'+k); if(el) el.value=CUST[k];
+      var vl=$('v_'+k); if(vl) vl.textContent=CUST[k]+'%';
+    });
+  }
+  // Auto-balance quarter weights (W1+W2+W3 = 100, W3 auto-adjusts)
+  if (['w1','w2','w3'].indexOf(key) > -1) {
+    if (key !== 'w3') {
+      CUST.w3 = Math.max(5, Math.min(70, 100 - CUST.w1 - CUST.w2));
+      var e3=$('s_w3'); if(e3) e3.value=CUST.w3;
+      var v3=$('v_w3'); if(v3) v3.textContent=CUST.w3+'%';
+    } else {
+      CUST.w2 = Math.max(5, Math.min(70, 100 - CUST.w1 - CUST.w3));
+      var e2=$('s_w2'); if(e2) e2.value=CUST.w2;
+      var v2=$('v_w2'); if(v2) v2.textContent=CUST.w2+'%';
+    }
+  }
+
+  var sok=(CUST.n+CUST.r+CUST.i)===100, wok=(CUST.w1+CUST.w2+CUST.w3)===100;
+  var sw=$('sw'), ww=$('ww');
+  if(sw){sw.style.color=sok?'var(--ok)':'var(--rd)'; sw.textContent=sok?'✓ sums to 100%':'⚠ must sum to 100% (now '+(CUST.n+CUST.r+CUST.i)+'%)';}
+  if(ww){ww.style.color=wok?'var(--ok)':'var(--rd)'; ww.textContent=wok?'✓ sums to 100%':'⚠ must sum to 100% (now '+(CUST.w1+CUST.w2+CUST.w3)+'%)';}
+  updateCmp();
+}
+
+function calcCustGoal(t) {
+  // Market share of this territory in the best plan
+  var terrs = S._territories && S._territories.length ? S._territories : [];
+  var tot   = terrs.reduce(function(a,x){ return a+(x.goal||x.fg||0); }, 0) || 1;
+  var nf    = S.gs && S.gs.nf ? S.gs.nf : (S.NF || tot);
+  var ms    = tot > 0 ? (t.goal||t.fg||0) / tot : 0;
+  // Regional goal = NF × market share
+  var rg    = nf * ms;
+  // Individual goal = forecast (best available proxy for territory potential)
+  var ig    = t.fc || t.goal || t.fg || 0;
+  // Blend by r/i split from sliders (n share is small, absorb into regional)
+  var rs    = (CUST.r + CUST.n/2) / 100;
+  var is_   = (CUST.i + CUST.n/2) / 100;
+  return Math.round(rs * rg + is_ * ig) || 0;
+}
+
+function updateCmp() {
+  var terrs = S._territories && S._territories.length ? S._territories : [];
+  if (!terrs.length) {
+    var st = $('cmp-stats');
+    if (st) st.innerHTML = '<div style="color:var(--t2);font-size:11px">Run Goal Setting first to populate comparison data.</div>';
+    return;
+  }
+
+  var custGoals = terrs.map(function(t){ return { t:t, cg:calcCustGoal(t) }; });
+  var ot   = custGoals.filter(function(x){ var fc=x.t.fc||x.t.fg||0; var a=fc&&x.cg?fc/x.cg:0; return a>=.85&&a<=1.15; }).length;
+  var ct   = custGoals.reduce(function(a,x){ return a+x.cg; }, 0);
+  var bt   = terrs.reduce(function(a,t){ return a+(t.goal||t.fg||0); }, 0);
+  var diff = ct - bt;
+  var cf   = Math.min(.99, Math.max(.1, (terrs.length?ot/terrs.length*.7:0)+.2)).toFixed(3);
+
+  var st = $('cmp-stats');
+  if (st) {
+    st.innerHTML =
+      '<div class="grid4" style="grid-template-columns:repeat(4,1fr)">' +
+      statCard('Fairness', cf, 'custom','c-gr') +
+      statCard('On Target', ot+'/'+terrs.length, '+-15% band','c-ok') +
+      statCard('Total Goals', fmt(ct), 'custom','c-bl') +
+      statCard('vs System', (diff>=0?'+':'')+fmt(Math.round(diff)), diff>0?'higher':'lower', diff>0?'c-rd':'c-ok') +
+      '</div>';
+  }
+
+  var bars = $('cmp-bars');
+  if (!bars) return;
+  var mx = 0;
+  custGoals.forEach(function(x){ mx = Math.max(mx, x.t.goal||x.t.fg||0, x.cg); });
+  if (!mx) return;
+
+  var h = '<div class="card"><div class="card-title">Territory Goals — System Best vs Custom</div>';
+  var showN = Math.min(terrs.length, 15);
+  for (var i=0; i<showN; i++) {
+    var t  = custGoals[i].t;
+    var cg = custGoals[i].cg;
+    var bg = t.goal || t.fg || 0;
+    var pb = Math.round(bg/mx*100), pc = Math.round(cg/mx*100);
+    var dp = bg ? Math.round((cg-bg)/bg*100) : 0;
+    var col = dp>5?'var(--rd)':dp<-5?'var(--ok)':'var(--t3)';
+    var tid = esc(t.id || t.territory_id || ('T'+i));
+    h += '<div style="margin-bottom:9px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px">' +
+      '<span style="font-family:var(--mono);color:var(--t2)">'+tid+'</span>' +
+      '<span style="color:'+col+';font-family:var(--mono)">'+(dp>0?'+':'')+dp+'%</span></div>' +
+      '<div style="display:flex;gap:4px;align-items:center">' +
+      '<span style="width:46px;font-size:9px;color:var(--t3)">Best</span>' +
+      '<div style="flex:1;height:5px;background:var(--b1);border-radius:3px;overflow:hidden">' +
+      '<div style="height:100%;width:'+pb+'%;background:var(--gr);opacity:.7;border-radius:3px"></div></div>' +
+      '<span style="width:62px;text-align:right;font-size:9px;font-family:var(--mono);color:var(--gr)">'+fmt(bg)+'</span></div>' +
+      '<div style="display:flex;gap:4px;align-items:center;margin-top:2px">' +
+      '<span style="width:46px;font-size:9px;color:var(--t3)">Custom</span>' +
+      '<div style="flex:1;height:5px;background:var(--b1);border-radius:3px;overflow:hidden">' +
+      '<div style="height:100%;width:'+pc+'%;background:var(--bl);opacity:.7;border-radius:3px"></div></div>' +
+      '<span style="width:62px;text-align:right;font-size:9px;font-family:var(--mono);color:var(--bl)">'+fmt(cg)+'</span></div>' +
+      '</div>';
+  }
+  if (terrs.length > showN) h += '<div style="font-size:10px;color:var(--t3);margin-top:6px">+ '+(terrs.length-showN)+' more territories</div>';
+  h += '</div>';
+  bars.innerHTML = h;
+}
+
+
+// ══════════════════════════════════════════════
+// GUARDRAILS & DELTA
+// ══════════════════════════════════════════════
+function doGuardrails() {
+  if (!S.sid) { msgBot('Run Goal Setting first.', []); return; }
+  var tid = msgTyping();
+  fetch('/api/guardrails/'+S.sid)
+  .then(function(r){return r.json();})
+  .then(function(d){
+    rmTyping(tid);
+    var h='<div class="card"><div class="card-title">Guardrails — '+d.scenario_id+'</div>';
+    (d.checks||[]).forEach(function(c){
+      h+='<div style="display:flex;align-items:flex-start;gap:7px;padding:7px 0;border-bottom:1px solid var(--b1)"><div style="width:17px;height:17px;border-radius:50%;background:'+(c.passed?'rgba(40,212,112,.15)':'rgba(240,72,85,.15)')+';color:'+(c.passed?'var(--ok)':'var(--rd)')+';display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px">'+(c.passed?'✓':'✗')+'</div><div><div style="font-size:12px;color:var(--tx)">'+c.rule+'</div><div style="font-size:10px;color:var(--t2)">'+c.description+'</div><div style="font-size:10px;font-family:var(--mono);color:'+(c.passed?'var(--ok)':'var(--rd)')+';margin-top:2px">'+c.value+'</div></div></div>';
+    });
+    h+='<div style="margin-top:8px;font-size:12px;color:'+(d.all_pass?'var(--ok)':'var(--rd)')+'">'+d.summary+'</div></div>';
+    // Show on whatever panel is visible
+    ['gr-res','gr-res4','gr-res2'].forEach(function(id){ var el=$(id); if(el) el.innerHTML=h; });
+    if (d.all_pass) {
+      msgBot('<strong style="color:var(--ok)">✓ All ' + (d.checks||[]).length + ' guardrails passed.</strong>', []);
+    } else {
+      var fails = (d.checks||[]).filter(function(c){return !c.passed;});
+      var msg = '<strong style="color:var(--am)">⚠ ' + fails.length + ' guardrail(s) need review:</strong><br>';
+      fails.forEach(function(c){ msg += '· <strong>'+esc(c.rule)+'</strong>: '+esc(c.value)+'<br>'; });
+      msg += '<br>Full details on the left panel.';
+      msgBot(msg, []);
+    }
+  })
+  .catch(function(){ rmTyping(tid); msgBot('Guardrails check failed. Please try again.', []); });
+}
+
+function doDelta() {
+  if (!S.sid) { msgBot('Run Goal Setting first.', []); return; }
+  var tid=msgTyping();
+  fetch('/api/compare/session/'+S.sid)
+  .then(function(r){return r.json();})
+  .then(function(d){
+    rmTyping(tid);
+    if(d.message){msgBot(d.message,[]);return;}
+    var att=d.attainability_shift_pp||0,fsc=d.fairness_score_shift||0,tgs=d.total_goals_shift||0,cns=d.consistency_shift_pp||0;
+    var h='<div class="card"><div class="card-title">Delta: '+d.best_scenario_id+' vs '+d.compare_scenario_id+'</div><div class="grid4">';
+    h+='<div class="stat"><div class="stat-l">Attainability</div><div class="stat-v '+(att>=0?'c-ok':'c-rd')+'">'+(att>=0?'+':'')+parseFloat(att).toFixed(1)+'pp</div></div>';
+    h+='<div class="stat"><div class="stat-l">Fairness</div><div class="stat-v '+(fsc>=0?'c-ok':'c-rd')+'">'+(fsc>=0?'+':'')+parseFloat(fsc).toFixed(3)+'</div></div>';
+    h+='<div class="stat"><div class="stat-l">Total Goals</div><div class="stat-v">'+(tgs>=0?'+':'')+fmt(Math.round(tgs))+'</div></div>';
+    h+='<div class="stat"><div class="stat-l">Consistency</div><div class="stat-v '+(cns>=0?'c-ok':'c-rd')+'">'+(cns>=0?'+':'')+parseFloat(cns).toFixed(1)+'pp</div></div>';
+    h+='</div>';
+    (d.narrative||[]).forEach(function(n){h+='<div style="font-size:11px;color:var(--t2);padding:5px 0;border-bottom:1px solid var(--b1)">'+n+'</div>';});
+    h+='</div>';
+    var el=$('dl-res')||$('dl-res4'); if(el) el.innerHTML=h;
+    msgBot('Delta insights are on the <strong>left panel</strong>.', []);
+  })
+  .catch(function(){rmTyping(tid);msgBot('Delta insights failed. Please try again.',[]);});
+}
+
+function doExport() {
+  if (!S.sid) { msgBot('Run Goal Setting first.', []); return; }
+  msgBot('Download your results:<br><a class="dl" href="/api/export/session/'+S.sid+'/excel" target="_blank">⬇ Excel (4 sheets)</a>', []);
+}
+
+// ══════════════════════════════════════════════
+// PAGE LOAD — immediate greeting, no API needed
+// ══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', function() {
+  renderChips(1);
+  setTimeout(function() {
+    var h = new Date().getHours();
+    var gr = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+    msgBot(gr+'. I am <strong>IC Intelligence</strong> — your incentive compensation planning assistant.<br><br>' +
+      'I can help you:<br>' +
+      '✓ Design IC structures via <strong>IC Advisory</strong><br>' +
+      '✓ Set territory goals via <strong>Goal Setting</strong><br>' +
+      '✓ Run 12-model sales forecasting<br>' +
+      '✓ Compare and validate scenarios<br><br>' +
+      'Where would you like to start?', []);
+    appendWidget(
+      '<div class="chips">' +
+      '<div class="chip" onclick="startIC()">Start IC Advisory</div>' +
+      '<div class="chip" onclick="startGS()">Run Goal Setting</div>' +
+      '<div class="chip" onclick="chat(\'What can you help me with?\')">What can you do?</div>' +
+      '<div class="chip" onclick="chat(\'What is a fairness score?\')">Fairness score explained</div>' +
+      '</div>'
+    );
+  }, 300);
+});
+</script>
+</body>
+</html>
